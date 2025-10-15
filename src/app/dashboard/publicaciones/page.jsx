@@ -275,19 +275,89 @@ export default function Publicaciones() {
 
             </form>
 
+
+
+
+
+
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault();
+                if (!file || file.length === 0) {
+                    alert("Selecciona al menos una imagen");
+                    return;
+                }
+                const uploadedUrls = [];
+                for (const f of file) {
+                    const formData = new FormData();
+                    formData.append("file", f);
+                    formData.append("upload_preset", UPLOAD_PRESET);
+
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                        method: "POST",
+                        body: formData,
+                    });
+                    if (!res.ok) {
+                        alert("Error subiendo una imagen");
+                        return;
+                    }
+                    const data = await res.json();
+                    uploadedUrls.push(data.secure_url);
+                }
+                // Llama al método de actualización
+                await actuzalizarPublicaciones(
+                    descripcionPublicaciones,
+                    uploadedUrls[0] || "",
+                    uploadedUrls[1] || "",
+                    uploadedUrls[2] || "",
+                    id_publicaciones
+                );
+                await listarPublicaciones(); // Para refrescar la lista
+            }}
+        >
+            <input
+                type="text"
+                name="descripcionPublicaciones"
+                value={descripcionPublicaciones || ""}
+                onChange={(e) => setDescripcionPublicaciones(e.target.value)}
+                className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
+                placeholder="Nueva descripción"
+            />
+            <br /><br />
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
+                className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
+            />
+            <br /><br />
+            <button
+                className="border border-2 rounded-2 w-50 h-10 rounded-2 p-2 bg-green-50 font-bold hover:bg-green-500 hover:text-white rounded-lg"
+                type="submit"
+            >
+                Actualizar Publicación
+            </button>
+        </form>
+
+
 <br/><br/><br/>
 
 
-            <select
-                className="border-2 w-80 rounded-2xl p-2 border-blue-600"
-                value={id_publicaciones}
-                onChange={(e) => setId_publicaciones(e.target.value)}
-            >
-                {listaPublicaciones.map((publicaciones) => (
-                    <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}> {publicaciones.descripcionPublicaciones}</option>
+        <select
+            className="border-2 w-80 rounded-2xl p-2 border-blue-600"
+            value={id_publicaciones}
+            onChange={(e) => setId_publicaciones(e.target.value)}
+        >
+            <option value="" disabled selected>-- Selecciona una Publicacion --</option>
+            {listaPublicaciones.map((publicaciones) => (
+                <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
+                    {publicaciones.descripcionPublicaciones}
+                </option>
+            ))}
+        </select>
 
-                ))}
-            </select>
+
 
             <button
                 className="w-40 h-10 rounded-2xl p-2 bg-blue-500 hover:bg-blue-500 hover:text-white rounded-lg"
