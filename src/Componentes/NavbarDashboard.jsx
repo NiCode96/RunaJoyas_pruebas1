@@ -23,7 +23,19 @@ export default function NavbarDashboard() {
   const handleCloseNavMenu = () => setAnchorElNav(null);
 
   return (
-    <AppBar position="static" color="primary" elevation={0}>
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+      `}</style>
+      <AppBar position="sticky" color="inherit" elevation={0} sx={{
+        bgcolor: 'transparent',
+        color: '#0A2540',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        backgroundImage: 'linear-gradient(135deg, #DCEBFF 0%, #E8F0FE 40%, #F2F7FF 100%)',
+        boxShadow: '0 8px 24px rgba(10, 37, 64, 0.08)',
+        backdropFilter: 'saturate(1.2) blur(4px)'
+      }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ gap: 2 }}>
           {/* Branding / Título */}
@@ -32,9 +44,9 @@ export default function NavbarDashboard() {
             component={Link}
             href="/dashboard"
             style={{ textDecoration: 'none', color: 'inherit' }}
-            sx={{ fontWeight: 700, letterSpacing: '.08rem' }}
+            sx={{ fontFamily: 'Michroma, sans-serif', fontWeight: 800, letterSpacing: '.12rem', color: '#0A2540' }}
           >
-            Administración
+            NativeCode — Dashboard
           </Typography>
 
           {/* Empuja el bloque de navegación a la derecha */}
@@ -42,40 +54,42 @@ export default function NavbarDashboard() {
 
           {/* Navegación Desktop */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-            {/* Ruta a PEDIDOS */}
-            {/* Reemplaza "/dashboard/pedidos" por la ruta real si es distinta */}
             <Button
               component={Link}
-              href="/dashboard/categoriasProductos" // <- AQUÍ VA LA RUTA DE CATEGORIAS
+              href="/dashboard/categoriasProductos"
               color="inherit"
+              disableRipple
+              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
             >
-              Categorias
+              Categorías
             </Button>
 
-              <Button
-                  component={Link}
-                  href="/dashboard/publicaciones" // <- AQUÍ VA LA RUTA DE PUBLICACIONES
-                  color="inherit"
-              >
-                  Publicaciones
-              </Button>
-
-            {/* Ruta a PRODUCTOS */}
-            {/* Reemplaza "/dashboard/productos" por la ruta real si es distinta */}
             <Button
               component={Link}
-              href="/dashboard/ingresoProductos" // <- AQUÍ VA LA RUTA DE PRODUCTOS
+              href="/dashboard/publicaciones"
               color="inherit"
+              disableRipple
+              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
+            >
+              Publicaciones
+            </Button>
+
+            <Button
+              component={Link}
+              href="/dashboard/ingresoProductos"
+              color="inherit"
+              disableRipple
+              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
             >
               Productos
             </Button>
 
-            {/* Ruta a EDICIÓN WEB */}
-            {/* Reemplaza "/dashboard/edicion" por la ruta real si es distinta */}
             <Button
               component={Link}
-              href="/dashboard/edicionPagina" // <- AQUÍ VA LA RUTA DE EDICIÓN WEB
+              href="/dashboard/edicionPagina"
               color="inherit"
+              disableRipple
+              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
             >
               Edición Web
             </Button>
@@ -89,6 +103,7 @@ export default function NavbarDashboard() {
               aria-expanded={Boolean(anchorElNav) ? 'true' : undefined}
               onClick={handleOpenNavMenu}
               color="inherit"
+              sx={{ fontFamily: 'Michroma, sans-serif' }}
             >
               Menú
             </Button>
@@ -102,20 +117,22 @@ export default function NavbarDashboard() {
               keepMounted
             >
               <MenuItem onClick={handleCloseNavMenu}>
-                <Link href="/dashboard/pedidos" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-                  {/* <- AQUÍ VA LA RUTA DE PEDIDOS */}
-                  Pedidos
+                <Link href="/dashboard/categoriasProductos" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  Categorías
                 </Link>
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
-                <Link href="/dashboard/productos" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-                  {/* <- AQUÍ VA LA RUTA DE PRODUCTOS */}
+                <Link href="/dashboard/publicaciones" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  Publicaciones
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link href="/dashboard/ingresoProductos" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                   Productos
                 </Link>
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
-                <Link href="/dashboard/edicion" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-                  {/* <- AQUÍ VA LA RUTA DE EDICIÓN WEB */}
+                <Link href="/dashboard/edicionPagina" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                   Edición Web
                 </Link>
               </MenuItem>
@@ -124,5 +141,6 @@ export default function NavbarDashboard() {
         </Toolbar>
       </Container>
     </AppBar>
+    </>
   );
 }

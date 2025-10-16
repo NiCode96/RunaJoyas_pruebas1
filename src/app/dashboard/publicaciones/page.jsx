@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 export default function Publicaciones() {
     const [file, setfile] = useState([]);
     const [url, setUrl] = useState([]);
+    const [isUploading, setIsUploading] = useState(false);
 
 
 
@@ -21,6 +22,51 @@ export default function Publicaciones() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME;
     const UPLOAD_PRESET = process.env.NEXT_PUBLIC_UPLOAD_PRESET;
+
+    // Límite de tamaño de Cloudinary (plan gratuito) ≈ 10 MB
+    const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
+
+    /**
+     * Redimensiona/comprime una imagen usando canvas.
+     * - Mantiene proporción.
+     * - Convierte a JPEG para una mejor compresión.
+     * @param {File|Blob} file
+     * @param {number} maxW
+     * @param {number} maxH
+     * @param {number} quality 0..1
+     * @returns {Promise<Blob>}
+     */
+    async function downscaleImage(file, maxW = 1600, maxH = 1600, quality = 0.8) {
+      const img = document.createElement("img");
+      const objectUrl = URL.createObjectURL(file);
+      try {
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = objectUrl;
+        });
+        const { width, height } = img;
+        const scale = Math.min(maxW / width, maxH / height, 1);
+        const targetW = Math.max(1, Math.round(width * scale));
+        const targetH = Math.max(1, Math.round(height * scale));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+        return await new Promise((resolve) =>
+          canvas.toBlob(
+            (blob) => resolve(blob),
+            "image/jpeg",
+            quality
+          )
+        );
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
 
 
 
@@ -209,184 +255,288 @@ export default function Publicaciones() {
     }
 
 
-    return (<div>
-            <form
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!file || file.length === 0) {
-                        alert("Selecciona al menos una imagen");
+    return (<div className="max-w-7xl mx-auto px-4 py-8 space-y-10">
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">Nueva publicación</h2>
+              <form
+                  onSubmit={async (e) => {
+                      e.preventDefault();
+                      setIsUploading(true);
+                      if (!file || file.length === 0) {
+                          setIsUploading(false);
+                          alert("Selecciona al menos una imagen");
+                          return;
+                      }
+                      // Validación de variables de entorno requeridas para Cloudinary
+                      if (!CLOUD_NAME || !UPLOAD_PRESET) {
+                        setIsUploading(false);
+                        console.error("Faltan variables de entorno para Cloudinary", {
+                          CLOUD_NAME: CLOUD_NAME || "NO DEFINIDO",
+                          UPLOAD_PRESET: UPLOAD_PRESET || "NO DEFINIDO",
+                        });
+                        alert("No se puede subir la imagen: faltan variables de entorno (CLOUD_NAME o UPLOAD_PRESET).");
                         return;
-                    }
-                    const uploadedUrls = [];
-                    for (const f of file) {
-                        const formData = new FormData();
-                        formData.append("file", f);
-                        formData.append("upload_preset", UPLOAD_PRESET);
+                      }
+                      const uploadedUrls = [];
+                      for (const f of file) {
+                          let toUpload = f;
 
-                        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                          // Si supera el límite, intentamos comprimir/redimensionar
+                          if (toUpload.size > MAX_UPLOAD_SIZE) {
+                            console.warn("Imagen supera 10MB, intentando comprimir...", {
+                              nombre: toUpload.name,
+                              sizeMB: (toUpload.size / (1024*1024)).toFixed(2)
+                            });
+                            const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
+                            if (compressed && compressed.size < toUpload.size) {
+                              toUpload = new File([compressed], (f.name || "image") + ".jpg", { type: "image/jpeg" });
+                              console.info("Imagen comprimida", {
+                                nuevaSizeMB: (toUpload.size / (1024*1024)).toFixed(2)
+                              });
+                            }
+                          }
+
+                          // Si aún excede el máximo, informamos y detenemos
+                          if (toUpload.size > MAX_UPLOAD_SIZE) {
+                            setIsUploading(false);
+                            alert("La imagen excede 10 MB incluso tras compresión. Por favor, súbela con menor resolución o peso.");
+                            return;
+                          }
+
+                          const formData = new FormData();
+                          formData.append("file", toUpload);
+                          formData.append("upload_preset", UPLOAD_PRESET);
+
+                          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
                             method: "POST",
                             body: formData,
-                        });
-                        if (!res.ok) {
-                            alert("Error subiendo una imagen");
+                          });
+                          if (!res.ok) {
+                            setIsUploading(false);
+                            const errText = await res.text();
+                            console.error("Error subiendo una imagen a Cloudinary:", res.status, errText);
+                            alert("Error subiendo una imagen. Revisa en Cloudinary que el UPLOAD_PRESET sea 'unsigned' y que el CLOUD_NAME sea correcto.");
                             return;
-                        }
-                        const data = await res.json();
-                        uploadedUrls.push(data.secure_url);
-                    }
-                    // Asignar URLs a los estados individuales
-                    setImagenPublicaciones_primera(uploadedUrls[0] || "");
-                    setImagenPublicaciones_segunda(uploadedUrls[1] || "");
-                    setImagenPublicaciones_tercera(uploadedUrls[2] || "");
+                          }
+                          const data = await res.json();
+                          uploadedUrls.push(data.secure_url);
+                      }
+                      // Asignar URLs a los estados individuales
+                      setImagenPublicaciones_primera(uploadedUrls[0] || "");
+                      setImagenPublicaciones_segunda(uploadedUrls[1] || "");
+                      setImagenPublicaciones_tercera(uploadedUrls[2] || "");
 
-                    await insertarPublicacion(
-                        descripcionPublicaciones,
-                        uploadedUrls[0] || "",
-                        uploadedUrls[1] || "",
-                        uploadedUrls[2] || "",
-                    );
-                }}
-            >
-
-                <input
-                    type="text"
-                    name="descripcionPublicaciones"
-                    value={descripcionPublicaciones || ""}
-                    onChange={(e) => setDescripcionPublicaciones(e.target.value)}
-                    className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
-                />
-
-                <br/>
-                <br/>
-
-                <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
-                    className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
-                />
-
-<br/><br/>
-
-                <button
-                    className="border border-2 rounded-2 w-50 h-10 rounded-2 p-2 bg-blue-50 font-bold hover:bg-blue-500 hover:text-white rounded-lg"
-                    type="submit">Subir Publicacion</button>
-
-            </form>
-
-
-
-
-
-
-        <form
-            onSubmit={async (e) => {
-                e.preventDefault();
-                if (!file || file.length === 0) {
-                    alert("Selecciona al menos una imagen");
-                    return;
-                }
-                const uploadedUrls = [];
-                for (const f of file) {
-                    const formData = new FormData();
-                    formData.append("file", f);
-                    formData.append("upload_preset", UPLOAD_PRESET);
-
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-                        method: "POST",
-                        body: formData,
-                    });
-                    if (!res.ok) {
-                        alert("Error subiendo una imagen");
-                        return;
-                    }
-                    const data = await res.json();
-                    uploadedUrls.push(data.secure_url);
-                }
-                // Llama al método de actualización
-                await actuzalizarPublicaciones(
-                    descripcionPublicaciones,
-                    uploadedUrls[0] || "",
-                    uploadedUrls[1] || "",
-                    uploadedUrls[2] || "",
-                    id_publicaciones
-                );
-                await listarPublicaciones(); // Para refrescar la lista
-            }}
-        >
-            <input
-                type="text"
-                name="descripcionPublicaciones"
-                value={descripcionPublicaciones || ""}
-                onChange={(e) => setDescripcionPublicaciones(e.target.value)}
-                className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
-                placeholder="Nueva descripción"
-            />
-            <br /><br />
-            <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
-                className="border border-2 rounded-2 w-100 h-10 rounded-2 p-2"
-            />
-            <br /><br />
-            <button
-                className="border border-2 rounded-2 w-50 h-10 rounded-2 p-2 bg-green-50 font-bold hover:bg-green-500 hover:text-white rounded-lg"
-                type="submit"
-            >
-                Actualizar Publicación
-            </button>
-        </form>
-
-
-<br/><br/><br/>
-
-
-        <select
-            className="border-2 w-80 rounded-2xl p-2 border-blue-600"
-            value={id_publicaciones}
-            onChange={(e) => setId_publicaciones(e.target.value)}
-        >
-            <option value="" disabled selected>-- Selecciona una Publicacion --</option>
-            {listaPublicaciones.map((publicaciones) => (
-                <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
-                    {publicaciones.descripcionPublicaciones}
-                </option>
-            ))}
-        </select>
-
-
-
-            <button
-                className="w-40 h-10 rounded-2xl p-2 bg-blue-500 hover:bg-blue-500 hover:text-white rounded-lg"
-                onClick={() => eliminarPublicacion(id_publicaciones)}
-            >Eliminar </button>
-
-        <br/><br/><br/>
-
-
-
-        <div>
-            {
-                listaPublicaciones.map((publicaciones) => (
-                    <div key={publicaciones.id_publicaciones}>
-                        <h1>{publicaciones.descripcionPublicaciones}</h1>
-                <div className="flex items-center justify-between">
-                    <img src={publicaciones.imagenPublicaciones_primera} alt="" />
-                    <img src={publicaciones.imagenPublicaciones_segunda} alt="" />
-                    <img src={publicaciones.imagenPublicaciones_tercera} alt="" />
-                </div>
+                      await insertarPublicacion(
+                          descripcionPublicaciones,
+                          uploadedUrls[0] || "",
+                          uploadedUrls[1] || "",
+                          uploadedUrls[2] || "",
+                      );
+                      // Limpieza de estados tras inserción exitosa
+                      setfile([]);
+                      setDescripcionPublicaciones("");
+                      setImagenPublicaciones_primera("");
+                      setImagenPublicaciones_segunda("");
+                      setImagenPublicaciones_tercera("");
+                      await listarPublicaciones();
+                      setIsUploading(false);
+                  }}
+              >
+                  <input
+                      type="text"
+                      name="descripcionPublicaciones"
+                      value={descripcionPublicaciones || ""}
+                      onChange={(e) => setDescripcionPublicaciones(e.target.value)}
+                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 focus:outline-none focus:border-blue-500"
+                  />
+                  <br/>
+                  <br/>
+                  <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
+                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 hover:file:bg-blue-100"
+                  />
+                  {isUploading && (
+                    <div className="mt-2 flex items-center gap-2 text-blue-600 text-sm">
+                      <span className="inline-block h-4 w-4 border-2 border-blue-300 border-t-transparent rounded-full animate-spin" />
+                      <span>Subiendo imagen a la nube...</span>
                     </div>
+                  )}
+                  <br/><br/>
+                  <button
+                      className={`inline-flex items-center justify-center h-10 px-5 rounded-xl border-2 border-blue-200 font-medium transition-colors ${isUploading ? "bg-blue-100 text-blue-400 cursor-not-allowed" : "bg-blue-50 text-blue-900 hover:bg-blue-500 hover:text-white"}`}
+                      type="submit"
+                      disabled={isUploading}
+                  >Subir Publicacion</button>
+              </form>
+            </section>
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">Actualizar publicación</h2>
+              <form
+                  onSubmit={async (e) => {
+                      e.preventDefault();
+                      setIsUploading(true);
+                      if (!file || file.length === 0) {
+                          setIsUploading(false);
+                          alert("Selecciona al menos una imagen");
+                          return;
+                      }
+                      // Validación de variables de entorno requeridas para Cloudinary
+                      if (!CLOUD_NAME || !UPLOAD_PRESET) {
+                        setIsUploading(false);
+                        console.error("Faltan variables de entorno para Cloudinary", {
+                          CLOUD_NAME: CLOUD_NAME || "NO DEFINIDO",
+                          UPLOAD_PRESET: UPLOAD_PRESET || "NO DEFINIDO",
+                        });
+                        alert("No se puede subir la imagen: faltan variables de entorno (CLOUD_NAME o UPLOAD_PRESET).");
+                        return;
+                      }
+                      const uploadedUrls = [];
+                      for (const f of file) {
+                          let toUpload = f;
 
-                ))
-            }
+                          // Si supera el límite, intentamos comprimir/redimensionar
+                          if (toUpload.size > MAX_UPLOAD_SIZE) {
+                            console.warn("Imagen supera 10MB, intentando comprimir...", {
+                              nombre: toUpload.name,
+                              sizeMB: (toUpload.size / (1024*1024)).toFixed(2)
+                            });
+                            const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
+                            if (compressed && compressed.size < toUpload.size) {
+                              toUpload = new File([compressed], (f.name || "image") + ".jpg", { type: "image/jpeg" });
+                              console.info("Imagen comprimida", {
+                                nuevaSizeMB: (toUpload.size / (1024*1024)).toFixed(2)
+                              });
+                            }
+                          }
 
-        </div>
+                          // Si aún excede el máximo, informamos y detenemos
+                          if (toUpload.size > MAX_UPLOAD_SIZE) {
+                            setIsUploading(false);
+                            alert("La imagen excede 10 MB incluso tras compresión. Por favor, súbela con menor resolución o peso.");
+                            return;
+                          }
 
+                          const formData = new FormData();
+                          formData.append("file", toUpload);
+                          formData.append("upload_preset", UPLOAD_PRESET);
 
+                          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                            method: "POST",
+                            body: formData,
+                          });
+                          if (!res.ok) {
+                            setIsUploading(false);
+                            const errText = await res.text();
+                            console.error("Error subiendo una imagen a Cloudinary:", res.status, errText);
+                            alert("Error subiendo una imagen. Revisa en Cloudinary que el UPLOAD_PRESET sea 'unsigned' y que el CLOUD_NAME sea correcto.");
+                            return;
+                          }
+                          const data = await res.json();
+                          uploadedUrls.push(data.secure_url);
+                      }
+                      // Llama al método de actualización
+                      await actuzalizarPublicaciones(
+                          descripcionPublicaciones,
+                          uploadedUrls[0] || "",
+                          uploadedUrls[1] || "",
+                          uploadedUrls[2] || "",
+                          id_publicaciones
+                      );
+                      await listarPublicaciones(); // Para refrescar la lista
+                      // Limpieza de estados tras actualización (excepto id_publicaciones)
+                      setfile([]);
+                      setDescripcionPublicaciones("");
+                      setImagenPublicaciones_primera("");
+                      setImagenPublicaciones_segunda("");
+                      setImagenPublicaciones_tercera("");
+                      setIsUploading(false);
+                  }}
+              >
+                  <input
+                      type="text"
+                      name="descripcionPublicaciones"
+                      value={descripcionPublicaciones || ""}
+                      onChange={(e) => setDescripcionPublicaciones(e.target.value)}
+                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 focus:outline-none focus:border-emerald-500"
+                      placeholder="Nueva descripción"
+                  />
+                  <br /><br />
+                  <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
+                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-50 hover:file:bg-emerald-100"
+                  />
+                  {isUploading && (
+                    <div className="mt-2 flex items-center gap-2 text-blue-600 text-sm">
+                      <span className="inline-block h-4 w-4 border-2 border-blue-300 border-t-transparent rounded-full animate-spin" />
+                      <span>Subiendo imagen a la nube...</span>
+                    </div>
+                  )}
+                  <br /><br />
+                  <button
+                      className={`inline-flex items-center justify-center h-10 px-5 rounded-xl border-2 font-medium transition-colors ${isUploading ? "border-emerald-200 bg-emerald-100 text-emerald-400 cursor-not-allowed" : "border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-500 hover:text-white"}`}
+                      type="submit"
+                      disabled={isUploading}
+                  >
+                      Actualizar Publicación
+                  </button>
+              </form>
+            </section>
 
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">Administrar publicaciones</h2>
+              <div className="flex flex-wrap items-center gap-3">
+                <select
+                    className="border-2 border-gray-200 w-80 rounded-xl px-3 h-10 focus:outline-none focus:border-rose-500"
+                    value={id_publicaciones}
+                    onChange={(e) => setId_publicaciones(e.target.value)}
+                >
+                    <option value="" disabled selected>-- Selecciona una Publicacion --</option>
+                    {listaPublicaciones.map((publicaciones) => (
+                        <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
+                            {publicaciones.descripcionPublicaciones}
+                        </option>
+                    ))}
+                </select>
+                <button
+                    className="inline-flex items-center justify-center w-40 h-10 rounded-xl bg-rose-500 text-white hover:bg-rose-600 transition-colors"
+                    onClick={() => eliminarPublicacion(id_publicaciones)}
+                >Eliminar </button>
+              </div>
+            </section>
+
+            <section aria-labelledby="publications-title" className="space-y-4">
+              <h2 id="publications-title" className="text-2xl font-semibold tracking-tight">Publicaciones</h2>
+              {listaPublicaciones.length === 0 ? (
+                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-gray-500">Aún no hay publicaciones.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {listaPublicaciones.map((publicaciones) => (
+                    <article key={publicaciones.id_publicaciones} className="group rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow">
+                      <div className="p-4">
+                        <h3 className="text-base font-medium truncate" title={publicaciones.descripcionPublicaciones}>{publicaciones.descripcionPublicaciones}</h3>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 p-4 pt-0">
+                        <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
+                          <img src={publicaciones.imagenPublicaciones_primera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                        <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
+                          <img src={publicaciones.imagenPublicaciones_segunda} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                        <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
+                          <img src={publicaciones.imagenPublicaciones_tercera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
         </div>)
 
 

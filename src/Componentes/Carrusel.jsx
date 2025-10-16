@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Carousel from 'react-bootstrap/Carousel';
 
-function ControlledCarousel() {
+function ControlledCarousel({imagen1, imagen2, imagen3}) {
     const [index, setIndex] = useState(0);
 
     const handleSelect = (selectedIndex) => {
@@ -11,43 +11,40 @@ function ControlledCarousel() {
     };
 
     return (
-        <Carousel activeIndex={index} onSelect={handleSelect}>
-            <Carousel.Item>
-                <img
-                    className="d-block w-100"
-                    src="https://via.placeholder.com/1200x500?text=First+slide"
-                    alt="First slide"
-                />
-                <Carousel.Caption>
-                    <h3>First slide label</h3>
-                    <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                </Carousel.Caption>
-            </Carousel.Item>
-            <Carousel.Item>
-                <img
-                    className="d-block w-100"
-                    src="https://via.placeholder.com/1200x500?text=Second+slide"
-                    alt="Second slide"
-                />
-                <Carousel.Caption>
-                    <h3>Second slide label</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                </Carousel.Caption>
-            </Carousel.Item>
-            <Carousel.Item>
-                <img
-                    className="d-block w-100"
-                    src="https://via.placeholder.com/1200x500?text=Third+slide"
-                    alt="Third slide"
-                />
-                <Carousel.Caption>
-                    <h3>Third slide label</h3>
-                    <p>
-                        Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-                    </p>
-                </Carousel.Caption>
-            </Carousel.Item>
-        </Carousel>
+        <div className="w-full h-full max-h-[600px] overflow-hidden rounded-xl">
+            <Carousel activeIndex={index} onSelect={handleSelect} className="w-full h-full">
+                <Carousel.Item>
+                    <img
+                        className="w-full h-auto object-cover rounded-lg"
+                        src={imagen1}
+                        alt="First slide"
+                    />
+                    <Carousel.Caption>
+
+                    </Carousel.Caption>
+                </Carousel.Item>
+                <Carousel.Item>
+                    <img
+                        className="w-full h-auto object-cover rounded-lg"
+                        src={imagen2}
+                        alt="Second slide"
+                    />
+                    <Carousel.Caption>
+
+                    </Carousel.Caption>
+                </Carousel.Item>
+                <Carousel.Item>
+                    <img
+                        className="w-full h-auto object-cover rounded-lg"
+                        src={imagen3}
+                        alt="Third slide"
+                    />
+                    <Carousel.Caption>
+
+                    </Carousel.Caption>
+                </Carousel.Item>
+            </Carousel>
+        </div>
     );
 }
 
