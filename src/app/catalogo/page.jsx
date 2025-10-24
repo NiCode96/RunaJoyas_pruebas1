@@ -2,14 +2,75 @@
 
 import {useState, useEffect} from 'react';
 import MediaCard from "@/Componentes/MediaCard";
+import data from "bootstrap/js/src/dom/data"
+import Link from "next/link";
 
 export default function Catalogo() {
 
     const[listaProductos, setListaProductos] = useState([]);
     const[publicaciones, setPublicaciones] = useState([]);
+    const [listaCategorias, setListaCategorias] = useState([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
 
 
     const API = process.env.NEXT_PUBLIC_API_URL;
+
+
+    //FUNCION PARA FILTRAR PRODUCTOS SEGUN CATEGORIA
+    async function filtrarPorCategoria(categoriaProducto){
+   try {
+       if(!categoriaProducto){
+           alert("Seleccione un categoria");
+           return;
+       }
+       const res = await fetch(`${API}/producto/categoriaProducto`, {
+           method: "POST",
+           headers: {Accept: "application/json",
+           "Content-Type": "application/json"},
+           mode: "cors",
+           body: JSON.stringify({categoriaProducto})
+       })
+       if (!res.ok){
+           alert("Problema al filtrar categorias contacte a Soporte de NativeCode.cl");
+           return;
+       }
+       const dataFiltrada = await res.json();
+       setListaProductos(dataFiltrada);
+   }catch (error) {
+       console.log(error);
+   }
+    }
+
+
+
+
+
+    // FUNCION PARA SELECCIONAR LA LISTA COMPLETA DE CATEGORIAS DE PRODUCTOS
+    async function seleccionarCategoriasCatalogo() {
+        try {
+            const res = await fetch(`${API}/categorias/seleccionarCategoria`, {
+                method: "GET",
+                headers: {Accept: "application/json"},
+                cache: "no-store",
+            })
+            if(!res.ok) {
+                console.error('No fue posible cargar la lista de categorias');
+                setListaCategorias([]);
+                return [];
+            }
+            const dataCategorias = await res.json();
+            const listaCategorias = Array.isArray(dataCategorias) ? dataCategorias : [];
+            setListaCategorias(listaCategorias);
+            return listaCategorias;
+        }catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        seleccionarCategoriasCatalogo();
+    }, []);
+
 
     async function listarProductos(){
         try {
@@ -22,7 +83,14 @@ export default function Catalogo() {
                 throw new Error('No fue posible cargar los productos');
             }
             const dataProductos = await res.json();
-            setListaProductos(dataProductos);
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
 
         }catch(err){
             console.log(err);
@@ -70,14 +138,7 @@ export default function Catalogo() {
                 {/* Encabezado del catálogo: título, subtítulo, breadcrumb y acciones visuales */}
                 <header className="mb-8">
 
-                    {/* Breadcrumb minimal para orientación del usuario */}
-                    <nav className="text-sm text-gray-500 mb-3" aria-label="Breadcrumb">
-                        <ol className="flex items-center gap-2">
-                            <li><a className="hover:text-gray-700" href="#">Inicio</a></li>
-                            <li className="text-gray-300">/</li>
-                            <li className="text-gray-900 font-medium">Catálogo</li>
-                        </ol>
-                    </nav>
+
 
                     {/* Título principal llamativo y subtítulo descriptivo */}
                     <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">Descubre la Colección</h1>
@@ -87,15 +148,42 @@ export default function Catalogo() {
 
                     {/* Barra de acciones (visual/mocks): etiquetas, orden y utilidades sin alterar lógica */}
                     <div className="mt-6 flex flex-wrap items-center gap-3">
-                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">Anillos</span>
-                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">Collares</span>
-                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">Aros</span>
-                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">Pulseras</span>
+                      <div className="w-full lg:w-auto">
+                        {/* ACCESIBILIDAD: ETIQUETA OCULTA PARA LECTOR DE PANTALLA */}
+                        <span className="sr-only">Filtrar por categoría</span>
+                        {/* CINTA DE CATEGORÍAS (RESPONSIVA): SCROLL HORIZONTAL EN MÓVIL */}
+                          <button
+                              key={"key"}
+                              type="button"
+                              onClick={() => listarProductos()}
+                              className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                          >
+                              Ver Todos
+                          </button>
+
+                        <div className="flex gap-2 overflow-x-auto py-2 pr-2">
+                          {listaCategorias.map((categoria) => (
+                            <button
+                              key={categoria.id_categoriaProducto}
+                              type="button"
+                              onClick={() => filtrarPorCategoria(categoria.id_categoriaProducto)}
+                              className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                            >
+                              {categoria.descripcionCategoria}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+
+
+
+
+
                         <div className="ml-auto flex items-center gap-2">
                             <span className="text-sm text-gray-500 hidden sm:inline">Ordenar:</span>
-                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Destacados</button>
-                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Nuevos</button>
-                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio</button>
+                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Menor</button>
+                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Mayor</button>
                         </div>
                     </div>
                 </header>
@@ -109,8 +197,8 @@ export default function Catalogo() {
                     {/* Sidebar de publicaciones/banners: se mantiene fijo en viewport alto, sin alterar la lógica */}
                     <aside className="hidden md:block order-2 lg:order-1 lg:col-span-1 space-y-4 sticky top-24 self-start">
                         {/* Título del sidebar para dar contexto visual */}
-                        <h3 className="text-sm font-semibold text-gray-900 mb-1">Inspiración</h3>
-                        <p className="text-sm text-gray-500 mb-4">Tendencias y campañas</p>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendecias</h3>
+                        <p className="text-sm text-gray-500 mb-4">Lo mejor de la temporada</p>
                         {/* Tarjetas simples para cada publicación: borde sutil, sombra ligera y transición al hover */}
                         {publicaciones.map(publicacion => (
                             <div key={publicacion.id_publicaciones} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition">
@@ -133,15 +221,26 @@ export default function Catalogo() {
                         {/* Grilla de tarjetas de producto: columnas adaptativas y buen espacio entre elementos */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
                             {
-                                listaProductos.map((producto) => (
-                                    <MediaCard
-                                        // Props con ambos nombres por compatibilidad (sin cambios en la lógica)
-                                        titulo={producto.tituloProducto}
-                                        descripcion={producto.descripcionProducto}
-                                        valor={producto.valorProducto}
-                                        imagenProducto={producto.imagenProducto}
-                                    />
-                                ))
+                                listaProductos.map((producto, index) => {
+
+                                    const id = producto.id_producto ?? index;
+                       return (
+                           <Link
+                               key={producto.id_producto ?? index}
+                               href={`/producto/${id}`}
+
+                           >
+                               <MediaCard
+
+                                   titulo={producto.tituloProducto}
+                                   valor={producto.valorProducto}
+                                   imagenProducto={producto.imagenProducto}
+                                   className-="no-underline hover:no-underline"
+
+                               />
+                           </Link>
+                       )
+                                })
                             }
                         </div>
                     </section>

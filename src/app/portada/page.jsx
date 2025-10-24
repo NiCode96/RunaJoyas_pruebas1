@@ -11,7 +11,7 @@ export default function Portada() {
 
     const API = process.env.NEXT_PUBLIC_API_URL;
 
-    async function listarCarrusel() {
+        async function listarCarrusel() {
         try {
             const res = await fetch(`${API}/publicaciones/seleccionarPublicaciones`, {
                 method: "GET",
@@ -22,7 +22,6 @@ export default function Portada() {
             if(!res.ok){
                 throw new Error("No se ha podido obtener publicaciones desde el servidor, contacte a soporte de NativeCode.cl");
             }
-
            const dataPublicaciones = await res.json();
             setPublicacion(dataPublicaciones[0]);
 
@@ -30,6 +29,10 @@ export default function Portada() {
             console.log(error);
         }
     }
+
+
+
+
 
     useEffect(() => {
         listarCarrusel()
@@ -39,7 +42,7 @@ export default function Portada() {
 
     return(
         <div>
-            <NavBarFemenino />
+
             <section className="relative w-full overflow-hidden">
                 <div className="w-full ">
                     {publicacion && (

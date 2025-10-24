@@ -1,4 +1,7 @@
+
+"use client";
 import * as React from 'react';
+import Link from 'next/link';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -18,13 +21,28 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import CloseIcon from '@mui/icons-material/Close';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
-const pages = ['Categorías', 'Ofertas', 'Más vendidos'];
+// Enlaces externos (placeholder) para Ofertas y Más Vendidos
+const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
+const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
+
+const CATEGORIES = [
+    { label: 'Joyas', href: '/categoria/joyas' },
+    { label: 'Collares', href: '/categoria/collares' },
+    { label: 'Pulseras', href: '/categoria/pulseras' },
+    { label: 'Aros', href: '/categoria/aros' },
+    { label: 'Accesorios', href: '/categoria/accesorios' },
+];
 
 function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const [anchorElCategorias, setAnchorElCategorias] = React.useState(null);
+    const [openCategoriasMobile, setOpenCategoriasMobile] = React.useState(false);
 
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const toggleMobileDrawer = () => setMobileOpen((prev) => !prev);
@@ -35,6 +53,20 @@ function ResponsiveAppBar() {
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
+    };
+
+    const handleOpenCategorias = (event) => {
+        setAnchorElCategorias(event.currentTarget);
+    };
+    const handleCloseCategorias = () => {
+        setAnchorElCategorias(null);
+    };
+    const toggleCategoriasMobile = () => setOpenCategoriasMobile((prev) => !prev);
+
+    const scrollToFooter = (e) => {
+        if (e) e.preventDefault();
+        const el = document.getElementById('footer');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     return (
@@ -100,13 +132,45 @@ function ResponsiveAppBar() {
                             </Box>
                             <Divider />
                             <List>
-                                {pages.map((page) => (
-                                    <ListItem key={page} disablePadding>
-                                        <ListItemButton>
-                                            <ListItemText primary={page} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
+                                {/* Categorías (colapsable en móvil) */}
+                                <ListItem disablePadding>
+                                    <ListItemButton onClick={toggleCategoriasMobile} aria-label="Abrir categorías">
+                                        <ListItemText primary="Categorías" />
+                                        {openCategoriasMobile ? <ExpandLess /> : <ExpandMore />}
+                                    </ListItemButton>
+                                </ListItem>
+                                <Collapse in={openCategoriasMobile} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        {CATEGORIES.map((cat) => (
+                                            <ListItem key={cat.label} disablePadding>
+                                                <ListItemButton component={Link} href={cat.href} sx={{ pl: 4 }}>
+                                                    <ListItemText primary={cat.label} />
+                                                </ListItemButton>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Collapse>
+
+                                {/* Ofertas (link a otra plataforma - placeholder) */}
+                                <ListItem disablePadding>
+                                    <ListItemButton component="a" href={OFERTAS_URL} target="_blank" rel="noopener noreferrer">
+                                        <ListItemText primary="Ofertas" />
+                                    </ListItemButton>
+                                </ListItem>
+
+                                {/* Más vendidos (link a otra plataforma - placeholder) */}
+                                <ListItem disablePadding>
+                                    <ListItemButton component="a" href={MAS_VENDIDOS_URL} target="_blank" rel="noopener noreferrer">
+                                        <ListItemText primary="Más vendidos" />
+                                    </ListItemButton>
+                                </ListItem>
+
+                                {/* Contacto (lleva a /Footer) */}
+                                <ListItem disablePadding>
+                                    <ListItemButton component={Link} href="/#footer">
+                                        <ListItemText primary="Contacto" />
+                                    </ListItemButton>
+                                </ListItem>
                             </List>
                         </Box>
                     </Drawer>
@@ -129,19 +193,66 @@ function ResponsiveAppBar() {
                     >
                         RunaJoyas
                     </Typography>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'center', gap: 2 }}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
-                            >
-                                {page}
-                            </Button>
-                        ))}
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-end', gap: 2 }}>
+                        {/* Botón Categorías (abre menú desplegable) */}
+                        <Button
+                            onClick={handleOpenCategorias}
+                            sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
+                            aria-controls={Boolean(anchorElCategorias) ? 'menu-categorias' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={Boolean(anchorElCategorias) ? 'true' : undefined}
+                        >
+                            Categorías
+                        </Button>
+                        <Menu
+                            id="menu-categorias"
+                            anchorEl={anchorElCategorias}
+                            open={Boolean(anchorElCategorias)}
+                            onClose={handleCloseCategorias}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                            keepMounted
+                        >
+                            {CATEGORIES.map((cat) => (
+                                <MenuItem key={cat.label} onClick={handleCloseCategorias} component={Link} href={cat.href}>
+                                    {cat.label}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+
+                        {/* Ofertas (enlace externo - placeholder) */}
+                        <Button
+                            component="a"
+                            href={OFERTAS_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
+                        >
+                            Ofertas
+                        </Button>
+
+                        {/* Más vendidos (enlace externo - placeholder) */}
+                        <Button
+                            component="a"
+                            href={MAS_VENDIDOS_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
+                        >
+                            Más vendidos
+                        </Button>
+
+                        {/* Contacto (lleva a /Footer) */}
+                        <Button
+                            component={Link}
+                            href="/Footer"
+                            sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
+                        >
+                            Contacto
+                        </Button>
                     </Box>
                     {/* Acciones a la derecha: carrito de compras */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { xs: 0, md: 'auto' } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
                         <Tooltip title="Carrito">
                             <IconButton size="large" color="inherit" aria-label="Carrito de compras">
                                 <Badge badgeContent={0} showZero overlap="circular" color="primary">

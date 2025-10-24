@@ -27,7 +27,7 @@ try {
     }
     const data = await res.json();
 
-    if(data.success){
+    if(data.message === true){
         await seleccionarCategorias();
         setdescripcionCategoria("");
         alert("Categoria actualizada correctamente");
@@ -60,7 +60,7 @@ async function eliminarCategorias(id_categoriaProducto) {
             return{success: false};
         }
         const data = await res.json();
-        if(data.success){
+        if(data.message === true){
             alert("Categoria eliminada correctamente");
             setdescripcionCategoria("");
             await seleccionarCategorias();
