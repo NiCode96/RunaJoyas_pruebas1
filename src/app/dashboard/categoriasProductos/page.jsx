@@ -2,6 +2,7 @@
 
 import {useState, useEffect} from "react";
 
+
 export default function CategoriasProductos() {
 
     const [categorias, setCategorias] = useState([]);

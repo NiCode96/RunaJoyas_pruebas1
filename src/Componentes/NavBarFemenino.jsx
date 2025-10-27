@@ -2,6 +2,7 @@
 "use client";
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -26,20 +27,56 @@ import Divider from '@mui/material/Divider';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-
+import {useState, useEffect} from 'react';
+import {useRouter} from 'next/navigation';
 // Enlaces externos (placeholder) para Ofertas y Más Vendidos
 const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
 const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
 
-const CATEGORIES = [
-    { label: 'Joyas', href: '/categoria/joyas' },
-    { label: 'Collares', href: '/categoria/collares' },
-    { label: 'Pulseras', href: '/categoria/pulseras' },
-    { label: 'Aros', href: '/categoria/aros' },
-    { label: 'Accesorios', href: '/categoria/accesorios' },
-];
+
 
 function ResponsiveAppBar() {
+
+    const [listaCategorias, setListaCategorias] = React.useState([]);
+    const API = process.env.NEXT_PUBLIC_API_URL;
+    const router = useRouter();
+    async function listarCategorias() {
+        try {
+            const res = await fetch(`${API}/categorias/seleccionarCategoria`,{
+                method: "GET",
+                headers: {Accept: "application/json"},
+                mode: "cors"
+            });
+
+            if(!res.ok) {
+                return alert("No fue Posible cargar las categorias correctamente, consulte a Soporte Informatico de NativeCode.cl")
+            }else {
+                const dataCategorias = await res.json();
+                setListaCategorias(dataCategorias);
+            }
+        }catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        listarCategorias();
+    },[])
+
+    const CATEGORIES = [{ label: 'Sin Categorioas', href: '/' },];
+
+    const scrollToFooter = (e) => {
+        if(e){
+            e.preventDefault();
+            const footerElement = document.getElementById("footer")
+            if (footerElement){
+                footerElement.scrollIntoView({behavior: "smooth", block: "start"});
+            }
+        }
+    }
+
+
+
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElCategorias, setAnchorElCategorias] = React.useState(null);
     const [openCategoriasMobile, setOpenCategoriasMobile] = React.useState(false);
@@ -63,11 +100,6 @@ function ResponsiveAppBar() {
     };
     const toggleCategoriasMobile = () => setOpenCategoriasMobile((prev) => !prev);
 
-    const scrollToFooter = (e) => {
-        if (e) e.preventDefault();
-        const el = document.getElementById('footer');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
 
     return (
         <AppBar
@@ -84,24 +116,29 @@ function ResponsiveAppBar() {
         >
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="a"
-                        href="#app-bar-with-responsive-menu"
+                    <Box
+                        component={Link}
+                        href="/"
                         sx={{
                             mr: 2,
                             display: { xs: 'none', md: 'flex' },
-                            fontFamily: 'Dancing Script, cursive',
-                            fontWeight: 600,
-                            letterSpacing: '.05rem',
-                            color: '#000',
+                            alignItems: 'center',
                             textDecoration: 'none',
                             '&:hover': { textDecoration: 'none' },
                         }}
+                        aria-label="Inicio Runa Joyas"
                     >
-                        RunaJoyas
-                    </Typography>
+                        <Box sx={{ height: 40 }}>
+                            <Image
+                                src="/runaJoyas.png"
+                                alt="Runa Joyas"
+                                width={160}
+                                height={60}
+                                priority
+                                style={{ height: '100%', width: 'auto' }}
+                            />
+                        </Box>
+                    </Box>
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', lg: 'none' } }}>
                         <IconButton
@@ -121,12 +158,18 @@ function ResponsiveAppBar() {
                         onClose={toggleMobileDrawer}
                         sx={{ display: { xs: 'block', lg: 'none' } }}
                     >
-                        <Box sx={{ width: 280 }} role="presentation" onClick={toggleMobileDrawer} onKeyDown={toggleMobileDrawer}>
+                        <Box sx={{ width: 280 }} role="presentation">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
-                                <Typography sx={{ fontFamily: 'Dancing Script, cursive', fontWeight: 600, letterSpacing: '.05rem', color: '#000' }}>
-                                    RunaJoyas
-                                </Typography>
-                                <IconButton aria-label="Cerrar menú">
+                                <Box sx={{ height: 28 }}>
+                                    <Image
+                                        src="/runaJoyas.png"
+                                        alt="Runa Joyas"
+                                        width={280}
+                                        height={70}
+                                        style={{ height: '100%', width: 'auto' }}
+                                    />
+                                </Box>
+                                <IconButton aria-label="Cerrar menú" onClick={toggleMobileDrawer}>
                                     <CloseIcon />
                                 </IconButton>
                             </Box>
@@ -134,17 +177,21 @@ function ResponsiveAppBar() {
                             <List>
                                 {/* Categorías (colapsable en móvil) */}
                                 <ListItem disablePadding>
-                                    <ListItemButton onClick={toggleCategoriasMobile} aria-label="Abrir categorías">
+                                    <ListItemButton onClick={(e) => { e.stopPropagation(); toggleCategoriasMobile(); }} aria-label="Abrir categorías">
                                         <ListItemText primary="Categorías" />
                                         {openCategoriasMobile ? <ExpandLess /> : <ExpandMore />}
                                     </ListItemButton>
                                 </ListItem>
                                 <Collapse in={openCategoriasMobile} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
-                                        {CATEGORIES.map((cat) => (
-                                            <ListItem key={cat.label} disablePadding>
-                                                <ListItemButton component={Link} href={cat.href} sx={{ pl: 4 }}>
-                                                    <ListItemText primary={cat.label} />
+                                        {listaCategorias.map((cat) => (
+                                            <ListItem key={cat.id_categoriaProducto} disablePadding>
+                                                <ListItemButton onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setMobileOpen(false);
+                                                    router.push(`/catalogo?categoria=${cat.id_categoriaProducto}`)
+                                                }}>
+                                                    <ListItemText primary={cat.descripcionCategoria} />
                                                 </ListItemButton>
                                             </ListItem>
                                         ))}
@@ -153,46 +200,51 @@ function ResponsiveAppBar() {
 
                                 {/* Ofertas (link a otra plataforma - placeholder) */}
                                 <ListItem disablePadding>
-                                    <ListItemButton component="a" href={OFERTAS_URL} target="_blank" rel="noopener noreferrer">
+                                    <ListItemButton   onClick={() => {router.push(`/catalogo?ofertas=true`); setMobileOpen(false);}}>
                                         <ListItemText primary="Ofertas" />
                                     </ListItemButton>
                                 </ListItem>
 
                                 {/* Más vendidos (link a otra plataforma - placeholder) */}
                                 <ListItem disablePadding>
-                                    <ListItemButton component="a" href={MAS_VENDIDOS_URL} target="_blank" rel="noopener noreferrer">
+                                    <ListItemButton component="a" href={MAS_VENDIDOS_URL} target="_blank" rel="noopener noreferrer" onClick={toggleMobileDrawer}>
                                         <ListItemText primary="Más vendidos" />
                                     </ListItemButton>
                                 </ListItem>
 
                                 {/* Contacto (lleva a /Footer) */}
                                 <ListItem disablePadding>
-                                    <ListItemButton component={Link} href="/#footer">
+                                    <ListItemButton onClick={(e) => { scrollToFooter(e); toggleMobileDrawer(); }}>
                                         <ListItemText primary="Contacto" />
                                     </ListItemButton>
                                 </ListItem>
                             </List>
                         </Box>
                     </Drawer>
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href="#app-bar-with-responsive-menu"
+                    <Box
+                        component={Link}
+                        href="/"
                         sx={{
                             mr: 2,
                             display: { xs: 'flex', md: 'none' },
                             flexGrow: 1,
-                            fontFamily: 'Dancing Script, cursive',
-                            fontWeight: 600,
-                            letterSpacing: '.05rem',
-                            color: '#000',
+                            alignItems: 'center',
                             textDecoration: 'none',
                             '&:hover': { textDecoration: 'none' },
                         }}
+                        aria-label="Inicio Runa Joyas"
                     >
-                        RunaJoyas
-                    </Typography>
+                        <Box sx={{ height: 28 }}>
+                            <Image
+                                src="/runaJoyas.png"
+                                alt="Runa Joyas"
+                                width={120}
+                                height={28}
+                                priority
+                                style={{ height: '100%', width: 'auto' }}
+                            />
+                        </Box>
+                    </Box>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-end', gap: 2 }}>
                         {/* Botón Categorías (abre menú desplegable) */}
                         <Button
@@ -213,19 +265,19 @@ function ResponsiveAppBar() {
                             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                             keepMounted
                         >
-                            {CATEGORIES.map((cat) => (
-                                <MenuItem key={cat.label} onClick={handleCloseCategorias} component={Link} href={cat.href}>
-                                    {cat.label}
+                            {listaCategorias.map((cat) => (
+                                <MenuItem key={cat.id_categoriaProducto} onClick={()=>{
+                                    handleCloseCategorias();
+                                    router.push(`/catalogo?categoria=${cat.id_categoriaProducto}`)
+                                }}>
+                                    {cat.descripcionCategoria}
                                 </MenuItem>
                             ))}
                         </Menu>
 
                         {/* Ofertas (enlace externo - placeholder) */}
                         <Button
-                            component="a"
-                            href={OFERTAS_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            onClick={() => { router.push(`/catalogo?ofertas=true`)}}
                             sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
                         >
                             Ofertas
@@ -244,8 +296,7 @@ function ResponsiveAppBar() {
 
                         {/* Contacto (lleva a /Footer) */}
                         <Button
-                            component={Link}
-                            href="/Footer"
+                            onClick={scrollToFooter}
                             sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
                         >
                             Contacto

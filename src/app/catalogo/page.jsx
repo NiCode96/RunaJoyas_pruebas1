@@ -2,10 +2,27 @@
 
 import {useState, useEffect} from 'react';
 import MediaCard from "@/Componentes/MediaCard";
-import data from "bootstrap/js/src/dom/data"
+import data from "bootstrap/js/src/dom/data";
 import Link from "next/link";
+import{useSearchParams} from "next/navigation";
 
-export default function Catalogo() {
+export default function Catalogo({searchParams}) {
+
+    const buscar = useSearchParams();
+    const id_CategoriaNavBar = buscar.get("categoria");
+    const buscarOfertas = buscar.get("ofertas");
+
+    useEffect(() => {
+        if(buscarOfertas){
+            listarOfertas();
+        }
+    }, [buscarOfertas]);
+
+    useEffect(() => {
+        if(id_CategoriaNavBar){
+            filtrarPorCategoria(id_CategoriaNavBar);
+        }
+    }, [id_CategoriaNavBar]);
 
     const[listaProductos, setListaProductos] = useState([]);
     const[publicaciones, setPublicaciones] = useState([]);
@@ -72,6 +89,36 @@ export default function Catalogo() {
     }, []);
 
 
+
+    // FUNCION PARA LLAMAR A LOS PRODUCTOS EN OFERTA ESTADO NUMERO 3 estadoProducto en base de datos
+    async function listarOfertas(){
+        try {
+            const res = await fetch(`${API}/producto/seleccionarOfertas`,{
+                method: 'GET',
+                headers: {Accept: 'application/json'},
+                mode: 'cors'
+            });
+            if (!res.ok) {
+                throw new Error('No fue posible cargar los productos');
+            }
+            const dataProductos = await res.json();
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+
+
+//FUNCION PARA LISTAR TODOS LOS PRODUCTOS QUE NO TENGAN ELIMINACION LOGICA
     async function listarProductos(){
         try {
             const res = await fetch(`${API}/producto/seleccionarProducto`,{
@@ -98,8 +145,10 @@ export default function Catalogo() {
     }
 
     useEffect(() => {
-        listarProductos();
-    }, [])
+        if(!buscarOfertas && !id_CategoriaNavBar){
+            listarProductos();
+        }
+    }, [buscarOfertas && id_CategoriaNavBar])
 
 
     async function publicacionesLaterales() {
@@ -148,20 +197,23 @@ export default function Catalogo() {
 
                     {/* Barra de acciones (visual/mocks): etiquetas, orden y utilidades sin alterar lógica */}
                     <div className="mt-6 flex flex-wrap items-center gap-3">
-                      <div className="w-full lg:w-auto">
+                      <div className="flex w-full lg:w-auto">
                         {/* ACCESIBILIDAD: ETIQUETA OCULTA PARA LECTOR DE PANTALLA */}
                         <span className="sr-only">Filtrar por categoría</span>
                         {/* CINTA DE CATEGORÍAS (RESPONSIVA): SCROLL HORIZONTAL EN MÓVIL */}
-                          <button
-                              key={"key"}
-                              type="button"
-                              onClick={() => listarProductos()}
-                              className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
-                          >
-                              Ver Todos
-                          </button>
+
 
                         <div className="flex gap-2 overflow-x-auto py-2 pr-2">
+
+                            <button
+                                key={"key"}
+                                type="button"
+                                onClick={() => listarProductos()}
+                                className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                            >
+                                Ver Todos
+                            </button>
+
                           {listaCategorias.map((categoria) => (
                             <button
                               key={categoria.id_categoriaProducto}
@@ -219,7 +271,7 @@ export default function Catalogo() {
                             <span className="text-sm text-gray-500">{listaProductos?.length ?? 0} resultados</span>
                         </div>
                         {/* Grilla de tarjetas de producto: columnas adaptativas y buen espacio entre elementos */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
                             {
                                 listaProductos.map((producto, index) => {
 
@@ -228,15 +280,14 @@ export default function Catalogo() {
                            <Link
                                key={producto.id_producto ?? index}
                                href={`/producto/${id}`}
-
+                               className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
+                               style={{ textDecoration: 'none', WebkitTextDecoration: 'none' }}
                            >
                                <MediaCard
-
                                    titulo={producto.tituloProducto}
-                                   valor={producto.valorProducto}
+                                   valor={`$ ${producto.valorProducto}`}
                                    imagenProducto={producto.imagenProducto}
-                                   className-="no-underline hover:no-underline"
-
+                                   className="no-underline hover:no-underline"
                                />
                            </Link>
                        )
