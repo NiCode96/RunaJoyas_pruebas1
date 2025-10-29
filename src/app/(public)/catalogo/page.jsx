@@ -11,6 +11,14 @@ export default function Catalogo({searchParams}) {
     const buscar = useSearchParams();
     const id_CategoriaNavBar = buscar.get("categoria");
     const buscarOfertas = buscar.get("ofertas");
+    const buscarRecientes = buscar.get("recientes");
+
+
+    useEffect(() => {
+        if(buscarRecientes){
+            listarRecientes();
+        }
+    }, [buscarRecientes]);
 
     useEffect(() => {
         if(buscarOfertas){
@@ -31,6 +39,34 @@ export default function Catalogo({searchParams}) {
 
 
     const API = process.env.NEXT_PUBLIC_API_URL;
+
+    //FUNCION PARA LISTAR TODOS LOS PRODUCTOS RECIENTES QUE NO TENGAN ELIMINACION LOGICA
+    async function listarRecientes(){
+        try {
+            const res = await fetch(`${API}/producto/seleccionarProductoReciente`,{
+                method: 'GET',
+                headers: {Accept: 'application/json'},
+                mode: 'cors'
+            });
+            if (!res.ok) {
+                throw new Error('No fue posible cargar los productos');
+            }
+            const dataProductos = await res.json();
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+
 
 
     //FUNCION PARA FILTRAR PRODUCTOS SEGUN CATEGORIA
@@ -145,7 +181,7 @@ export default function Catalogo({searchParams}) {
     }
 
     useEffect(() => {
-        if(!buscarOfertas && !id_CategoriaNavBar){
+        if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
             listarProductos();
         }
     }, [buscarOfertas && id_CategoriaNavBar])
@@ -178,12 +214,49 @@ export default function Catalogo({searchParams}) {
         publicacionesLaterales();
     }, []);
 
+    async function ordenarMayorPrecio(){
+        try {
+            const res = await fetch(`${API}/producto/ordenarMayor`, {
+                method: "GET",
+                headers: {Accept: "application/json"},
+                mode: "cors"
+            })
+
+            if(!res.ok) {
+                return alert("Ha habido un problema con el filtro de precios porfavor contacte soporte TI de native code")
+            }else {
+                const dataProductosMayorPrecio = await res.json();
+                setListaProductos(dataProductosMayorPrecio);
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async function ordenarMenorPrecio(){
+        try {
+            const res = await fetch(`${API}/producto/ordenarMenor`, {
+                method: "GET",
+                headers: {Accept: "application/json"},
+                mode: "cors"
+            })
+            if(!res.ok) {
+                return alert("Ha habido un problema con el filtro de precios porfavor contacte soporte TI de Nativecode");
+            }else{
+                const dataProductosMenorPrecio = await res.json();
+                setListaProductos(dataProductosMenorPrecio);
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }
+
 
 
     return (
         <>
             {/* Contenedor principal del catálogo: ancho máximo, centrado y espaciado vertical */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white">
+            <div className="mt-15 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white">
                 {/* Encabezado del catálogo: título, subtítulo, breadcrumb y acciones visuales */}
                 <header className="mb-8">
 
@@ -234,8 +307,12 @@ export default function Catalogo({searchParams}) {
 
                         <div className="ml-auto flex items-center gap-2">
                             <span className="text-sm text-gray-500 hidden sm:inline">Ordenar:</span>
-                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Menor</button>
-                            <button className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Mayor</button>
+                            <button
+                                onClick={() => ordenarMenorPrecio()}
+                                className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Menor</button>
+                            <button
+                                onClick={() => ordenarMayorPrecio()}
+                                className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Mayor</button>
                         </div>
                     </div>
                 </header>

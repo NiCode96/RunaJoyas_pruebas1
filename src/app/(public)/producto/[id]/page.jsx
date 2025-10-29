@@ -74,10 +74,10 @@ useEffect(() => {
                   </label>
                 </div>
 
-                {/* DESCRIPCIÓN */}
-                <p className="text-slate-600 leading-relaxed">
-                  {producto.descripcionProducto}
-                </p>
+      {/* DESCRIPCIÓN */}
+            <p className="text-slate-600 leading-relaxed whitespace-pre-line break-words">
+              {producto.descripcionProducto}
+            </p>
 
                 {/* SEPARADOR SUTIL */}
                 <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />

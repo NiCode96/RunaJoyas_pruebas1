@@ -11,9 +11,9 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
   return (
     <Card
       sx={{
-        maxWidth: 280,
+        maxWidth: 320,
         width: '100%',
-        height: 300,
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 3,
@@ -24,13 +24,22 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
         textDecoration: 'none'
       }}
     >
+      {/* Imagen cuadrada y responsiva: usamos un contenedor con paddingTop 100% para mantener ratio 1:1 */}
       <CardMedia
-        sx={{ height: 180, objectFit: 'cover', textDecoration: 'none' }}
-        image={imagenProducto}
-        title={titulo}
         component="div"
+        sx={{
+          pt: '100%', // 1:1 aspect ratio (cuadrada)
+          backgroundImage: imagenProducto ? `url(${imagenProducto})` : 'linear-gradient(180deg,#f3f4f6,#e5e7eb)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          // evitar que la imagen empuje el resto del contenido
+          minHeight: 0,
+        }}
+        title={titulo}
       />
-      <CardContent sx={{ flexGrow: 1, textDecoration: 'none' }}>
+
+      <CardContent sx={{ flexGrow: 1, textDecoration: 'none', paddingBottom: 1 }}>
         <Typography
           gutterBottom
           variant="h6"
@@ -49,7 +58,7 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
           {titulo}
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main', mb: 0.5, textDecoration: 'none' }}>
-         <label style={{textDecoration: 'none'}}>Precio: </label> {valor}
+         <span style={{textDecoration: 'none'}}>Precio: </span> {valor}
         </Typography>
         <Typography
           variant="body2"
@@ -66,13 +75,14 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
           {descripcion}
         </Typography>
       </CardContent>
+
       {(boton1 || boton2) && (
         <CardActions sx={{ mt: 'auto', px: 2, pb: 2, justifyContent: 'space-between', textDecoration: 'none' }}>
           {boton1 && (
             <Button
               variant="contained"
               size="small"
-              sx={{ textTransform: 'none', fontWeight: 600, textDecoration: 'none' }}
+              sx={{ textTransform: 'none', fontWeight: 600 }}
             >
               {boton1}
             </Button>
@@ -81,7 +91,7 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
             <Button
               variant="outlined"
               size="small"
-              sx={{ textTransform: 'none', fontWeight: 600, textDecoration: 'none' }}
+              sx={{ textTransform: 'none', fontWeight: 600 }}
             >
               {boton2}
             </Button>

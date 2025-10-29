@@ -8,6 +8,7 @@ export default function CategoriasProductos() {
     const [categorias, setCategorias] = useState([]);
     const [categoriaSelecionado, setCategoriaSelecionado] = useState(null);
     const [descripcionCategoria,setdescripcionCategoria] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,6 +16,7 @@ export default function CategoriasProductos() {
 //FUNCION PARA ACTUALIZAR CATEGORIA
 async function actualizarCategoria(id_categoriaProducto, descripcionCategoria) {
 try {
+    setIsLoading(true);
     const res = await fetch(`${API}/categorias/actualizarCategoria`, {
         method: 'POST',
         headers: {Accept: 'application/json',
@@ -42,6 +44,8 @@ try {
     alert("Ha ocurrido un error : contacte a soporte Informatico : " + error.message);
     console.error(error);
 
+} finally {
+    setIsLoading(false);
 }
     }
 
@@ -50,6 +54,7 @@ try {
 //FUNCION PARA ELIMINAR LA CATEGORIA DE MANERA LOGICA EN LA BASE DE DATOS
 async function eliminarCategorias(id_categoriaProducto) {
     try {
+        setIsLoading(true);
         const res = await fetch(`${API}/categorias/eliminarCategoria`, {
             method: "POST",
             headers: {Accept: "application/json",
@@ -72,6 +77,8 @@ async function eliminarCategorias(id_categoriaProducto) {
         }
     }catch(err) {
         console.log(err);
+    } finally {
+        setIsLoading(false);
     }
 }
 
@@ -83,6 +90,7 @@ async function eliminarCategorias(id_categoriaProducto) {
 async function insertarCategoria(event) {
     try {
         event.preventDefault();
+        setIsLoading(true);
 
         const res = await fetch(`${API}/categorias/insertarCategoria`, {
             method: 'POST',
@@ -106,6 +114,8 @@ async function insertarCategoria(event) {
         }
     }catch (error) {
         console.log(error);
+    } finally {
+        setIsLoading(false);
     }
 }
 
@@ -143,6 +153,7 @@ async function seleccionarCategoriaEspecifica(id_categoriaProducto) {
 // FUNCION PARA SELECCIONAR LA LISTA COMPLETA DE CATEGORIAS DE PRODUCTOS
 async function seleccionarCategorias() {
     try {
+        setIsLoading(true);
         const res = await fetch(`${API}/categorias/seleccionarCategoria`, {
             method: "GET",
             headers: {Accept: "application/json"},
@@ -158,9 +169,12 @@ async function seleccionarCategorias() {
         setCategorias(listaCategorias);
         return listaCategorias;
 
-    }catch (error) {
+    } catch (error) {
         console.error(error);
-
+        setCategorias([]);
+        return [];
+    } finally {
+        setIsLoading(false);
     }
 }
 
@@ -189,7 +203,8 @@ return (
                           value={descripcionCategoria}
                           onChange={(event) => setdescripcionCategoria(event.target.value)}
                           placeholder="Tipo de categoría..."
-                          className="w-full mt-2 rounded-xl border border-slate-300/90 bg-white/90 text-slate-800 px-4 py-2.5 shadow-sm outline-none ring-0 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 placeholder:text-slate-400 transition"
+                          className="w-full mt-2 rounded-xl border border-slate-300/90 bg-white/90 text-slate-800 px-4 py-2.5 shadow-sm outline-none ring-0 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 placeholder:text-slate-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                          disabled={isLoading}
                       />
 
                       <br/><br/>
@@ -207,7 +222,8 @@ return (
                           <button
                               onClick={()=> actualizarCategoria(categoriaSelecionado.id_categoriaProducto, descripcionCategoria)}
                               type="button"
-                              className="mt-3 ml-3 inline-flex items-center justify-center rounded-xl border border-emerald-600/80 bg-emerald-600/10 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm hover:bg-emerald-600/20 active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-emerald-100 transition"
+                              disabled={isLoading}
+                              className="mt-3 ml-3 inline-flex items-center justify-center rounded-xl border border-emerald-600/80 bg-emerald-600/10 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm hover:bg-emerald-600/20 active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-emerald-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
                           >
                               Actualizar
                           </button>
@@ -228,27 +244,52 @@ return (
 
                   {/* MAPEO DEL LISTADO DE CATEGORIAS CON EL FETCH USEFECT*/}
                   <div className="space-y-3 max-h-[28rem] overflow-y-auto pr-1">
-                      {categorias.map((categoria) => (
+                    {isLoading ? (
+                      // Skeleton loader list (fixed height to avoid layout shift)
+                      <div className="space-y-3">
+                        {Array.from({ length: 6 }).map((_, i) => (
                           <div
-                              className="flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 shadow-sm hover:shadow-md transition"
-                              key={categoria.id_categoriaProducto}>
-                              <h1 className="p-2 font-medium text-slate-800">{categoria.descripcionCategoria}</h1>
-                              <button
-                                  className="inline-flex items-center rounded-lg border border-sky-600/80 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-4 focus:ring-sky-100 active:scale-[0.99] transition"
-                                  onClick={() => seleccionarCategoriaEspecifica(categoria.id_categoriaProducto)}
-                              >
-                                  Seleccionar
-                              </button>
-
-
-                              <button
-                                  className="inline-flex items-center rounded-lg border border-rose-600/80 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-100 active:scale-[0.99] transition"
-                                  onClick={() => eliminarCategorias(categoria.id_categoriaProducto)}
-                              >
-                                  Eliminar
-                              </button>
+                            key={i}
+                            className="animate-pulse flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3"
+                          >
+                            <div className="h-5 w-48 rounded bg-slate-200" />
+                            <div className="flex gap-2">
+                              <div className="h-8 w-20 rounded bg-slate-200" />
+                              <div className="h-8 w-20 rounded bg-slate-200" />
+                            </div>
                           </div>
-                      ))}
+                        ))}
+                      </div>
+                    ) : categorias.length === 0 ? (
+                      <div className="rounded-xl border border-slate-200/90 bg-white/90 px-4 py-6 text-center text-slate-500">
+                        No hay categorías registradas todavía.
+                      </div>
+                    ) : (
+                      categorias.map((categoria) => (
+                        <div
+                          className="flex items-center justify-between rounded-xl border border-slate-200/90 bg-white/90 px-4 py-3 shadow-sm hover:shadow-md transition"
+                          key={categoria.id_categoriaProducto}
+                        >
+                          <h1 className="p-2 font-medium text-slate-800">{categoria.descripcionCategoria}</h1>
+                          <div className="flex gap-2">
+                            <button
+                              className="inline-flex items-center rounded-lg border border-sky-600/80 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 focus:outline-none focus:ring-4 focus:ring-sky-100 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                              onClick={() => seleccionarCategoriaEspecifica(categoria.id_categoriaProducto)}
+                              disabled={isLoading}
+                            >
+                              Seleccionar
+                            </button>
+                            <button
+                              className="inline-flex items-center rounded-lg border border-rose-600/80 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-100 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                              onClick={() => eliminarCategorias(categoria.id_categoriaProducto)}
+                              disabled={isLoading}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
 
               </div>
