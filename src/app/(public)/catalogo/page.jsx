@@ -1,12 +1,20 @@
 "use client"
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, Suspense} from 'react';
 import MediaCard from "@/Componentes/MediaCard";
-import data from "bootstrap/js/src/dom/data";
 import Link from "next/link";
 import{useSearchParams} from "next/navigation";
+import { toast } from 'react-hot-toast';
 
-export default function Catalogo({searchParams}) {
+export default function Catalogo() {
+  return (
+    <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
+      <CatalogoInner />
+    </Suspense>
+  );
+}
+
+function CatalogoInner() {
 
     const buscar = useSearchParams();
     const id_CategoriaNavBar = buscar.get("categoria");
@@ -30,7 +38,7 @@ export default function Catalogo({searchParams}) {
         if(id_CategoriaNavBar){
             filtrarPorCategoria(id_CategoriaNavBar);
         }
-    }, [id_CategoriaNavBar]);
+    }, [id_CategoriaNavBar]) ;
 
     const[listaProductos, setListaProductos] = useState([]);
     const[publicaciones, setPublicaciones] = useState([]);
@@ -73,7 +81,6 @@ export default function Catalogo({searchParams}) {
     async function filtrarPorCategoria(categoriaProducto){
    try {
        if(!categoriaProducto){
-           alert("Seleccione un categoria");
            return;
        }
        const res = await fetch(`${API}/producto/categoriaProducto`, {
@@ -84,8 +91,8 @@ export default function Catalogo({searchParams}) {
            body: JSON.stringify({categoriaProducto})
        })
        if (!res.ok){
-           alert("Problema al filtrar categorias contacte a Soporte de NativeCode.cl");
-           return;
+          toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
+          return;
        }
        const dataFiltrada = await res.json();
        setListaProductos(dataFiltrada);
@@ -184,7 +191,7 @@ export default function Catalogo({searchParams}) {
         if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
             listarProductos();
         }
-    }, [buscarOfertas && id_CategoriaNavBar])
+    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
 
 
     async function publicacionesLaterales() {
@@ -223,8 +230,8 @@ export default function Catalogo({searchParams}) {
             })
 
             if(!res.ok) {
-                return alert("Ha habido un problema con el filtro de precios porfavor contacte soporte TI de native code")
-            }else {
+                return toast.error("Ha habido un problema con el filtro de precios; contacte soporte TI de NativeCode.")
+             } else {
                 const dataProductosMayorPrecio = await res.json();
                 setListaProductos(dataProductosMayorPrecio);
             }
@@ -241,8 +248,8 @@ export default function Catalogo({searchParams}) {
                 mode: "cors"
             })
             if(!res.ok) {
-                return alert("Ha habido un problema con el filtro de precios porfavor contacte soporte TI de Nativecode");
-            }else{
+                return toast.error("Ha habido un problema con el filtro de precios; contacte soporte TI de NativeCode.");
+             } else{
                 const dataProductosMenorPrecio = await res.json();
                 setListaProductos(dataProductosMenorPrecio);
             }
@@ -328,8 +335,13 @@ export default function Catalogo({searchParams}) {
                         {/* Título del sidebar para dar contexto visual */}
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendecias</h3>
                         <p className="text-sm text-gray-500 mb-4">Lo mejor de la temporada</p>
+
+
+
                         {/* Tarjetas simples para cada publicación: borde sutil, sombra ligera y transición al hover */}
-                        {publicaciones.map(publicacion => (
+                        {publicaciones
+                            .filter(publicacion => Number(publicacion.id_publicaciones) !== 10)
+                            .map(publicacion => (
                             <div key={publicacion.id_publicaciones} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition">
                                 <img
                                     src={publicacion.imagenPublicaciones_primera}
@@ -338,6 +350,9 @@ export default function Catalogo({searchParams}) {
                                 />
                             </div>
                         ))}
+
+
+
                     </aside>
 
                     {/* Sección principal con la grilla de productos */}

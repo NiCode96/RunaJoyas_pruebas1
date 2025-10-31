@@ -1,6 +1,7 @@
 "use client"
 
 import {useState, useEffect} from "react";
+import { toast } from 'react-hot-toast';
 
 
 export default function CategoriasProductos() {
@@ -33,15 +34,15 @@ try {
     if(data.message === true){
         await seleccionarCategorias();
         setdescripcionCategoria("");
-        alert("Categoria actualizada correctamente");
+        toast.success("Categoría actualizada correctamente");
         return {success: true};
     }else{
-        alert("Categoria no se pudo actualizar contacte a soporte Informatico")
+        toast.error("Categoría no se pudo actualizar, contacte a Soporte Informático")
     }
 
 
 }catch (error) {
-    alert("Ha ocurrido un error : contacte a soporte Informatico : " + error.message);
+    toast.error("Ha ocurrido un error: contacte a Soporte Informático: " + error.message);
     console.error(error);
 
 } finally {
@@ -67,12 +68,12 @@ async function eliminarCategorias(id_categoriaProducto) {
         }
         const data = await res.json();
         if(data.message === true){
-            alert("Categoria eliminada correctamente");
+            toast.success("Categoría eliminada correctamente");
             setdescripcionCategoria("");
             await seleccionarCategorias();
             return {success: true};
         }else {
-            alert("No fue posible eliminar la categoria");
+            toast.error("No fue posible eliminar la categoría");
             return {success: false};
         }
     }catch(err) {
@@ -81,8 +82,6 @@ async function eliminarCategorias(id_categoriaProducto) {
         setIsLoading(false);
     }
 }
-
-
 
 
 
@@ -107,16 +106,16 @@ async function insertarCategoria(event) {
 
         const data = await res.json();
         if (data) {
-            alert("Categoria Ingresada!");
-            setdescripcionCategoria("");
-            await seleccionarCategorias();
-            return data;
-        }
-    }catch (error) {
-        console.log(error);
-    } finally {
-        setIsLoading(false);
-    }
+            toast.success("Categoría ingresada correctamente");
+             setdescripcionCategoria("");
+             await seleccionarCategorias();
+             return data;
+         }
+     }catch (error) {
+         console.log(error);
+     } finally {
+         setIsLoading(false);
+     }
 }
 
 

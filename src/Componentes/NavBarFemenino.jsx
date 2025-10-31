@@ -28,6 +28,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import {useEffect} from 'react';
 import {useRouter} from 'next/navigation';
+import { toast } from 'react-hot-toast';
 // Enlaces externos (placeholder) para Más Vendidos
 // const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
 const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
@@ -48,7 +49,8 @@ function ResponsiveAppBar() {
             });
 
             if(!res.ok) {
-                return alert("No fue Posible cargar las categorias correctamente, consulte a Soporte Informatico de NativeCode.cl")
+                toast.error("No fue posible cargar las categorías. Consulte a Soporte Informático de NativeCode.cl");
+                return;
             }else {
                 const dataCategorias = await res.json();
                 setListaCategorias(dataCategorias);

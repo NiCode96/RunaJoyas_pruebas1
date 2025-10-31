@@ -1,18 +1,19 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
+import {toast, Toaster} from "react-hot-toast";
 
 export default function Publicaciones() {
     const [file, setfile] = useState([]);
-    const [url, setUrl] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
-
+    // Estados para insertar nueva publicación (1 imagen)
+    const [newDescripcion, setNewDescripcion] = useState("");
+    const [newFile, setNewFile] = useState(null);
+    const [newPreview, setNewPreview] = useState(null);
+    const [isInserting, setIsInserting] = useState(false);
 
 
     const [descripcionPublicaciones, setDescripcionPublicaciones] = useState("");
-    const [imagenPublicaciones_primera, setImagenPublicaciones_primera] = useState("");
-    const [imagenPublicaciones_segunda, setImagenPublicaciones_segunda] = useState("");
-    const [imagenPublicaciones_tercera, setImagenPublicaciones_tercera] = useState("");
     const [listaPublicaciones, setListaPublicaciones] = useState([]);
     const [id_publicaciones, setId_publicaciones] = useState("");
 
@@ -97,20 +98,18 @@ export default function Publicaciones() {
             })
             const resultado = await res.json();
             if (!res.ok) {
-                alert('No fue posible actulizar la publicacion seleccionada, porfavor contacte a soporte informatico de NativeCode.cl')
-                return resultado;
+                return toast.error(" ❌ No fue posible actulizar la publicacion seleccionada, porfavor contacte a soporte informatico de NativeCode.cl");
+
             }else{
                 if (resultado.message === "sindato"){
-                    alert('No fue posible actulizar la publicacion / Debe llenar los campos obligartirios')
-                    return resultado;
+                    return  toast.error(' ❌ No fue posible actulizar la publicacion / Debe llenar los campos obligartirios');
                 }
                 if (resultado.message === true){
-                    alert('Se ha actualziado con exito la publicacion seleccionada')
-                    return resultado;
+                    return  toast.success(' ✅ Se ha actualizado con la publicacion de manera exitosa');
                 }
             }
         }catch (error) {
-            console.log("No se ha podido actualizar la publicacion ERRPOR :" + error );
+            return toast.error(" ❌ No fue posible actulizar la publicacion seleccionada, porfavor contacte a soporte informatico de NativeCode.cl");
         }
 
     }
@@ -133,31 +132,23 @@ export default function Publicaciones() {
             const resultado = await res.json();
 
             if(!res.ok) {
-                alert("No se ha podido eliminar publicacion consulte con soporte de NativeCode")
-                return resultado;
+                return toast.error(" ❌ No se ha podido eliminar publicacion consulte con soporte de NativeCode ");
             }else{
 
-
-
                 if(resultado.message === "sindato"){
-                    alert("No se ha seleccionado ninguna publicacion para ser eliminada, Debe seleccionar almenos una opcion")
-                    console.log(resultado)
-                    return resultado;
-
+                    return toast.error(" ❌ No se ha podido eliminar publicacion / Debe seleccionar la publicacion que desea eliminar ");
                 }
 
                 if(resultado.message === true){
-                    alert("Se ha eliminado publicacion seleccionada correctamente")
-                   await listarPublicaciones();
-                    return resultado;
+                    await listarPublicaciones();
+                    return  toast.success(' ✅ Se ha eliminado la publicacion de manera exitosa');
                 }
-
             }
 
         }catch (error) {
-            console.log("No se ha podido eliminar publicacion por error en el fecth : " + error);
-        }
+            return toast.error(" ❌ No se ha podido eliminar publicacion consulte con soporte de NativeCode ");        }
     }
+
 
 
 
@@ -197,7 +188,7 @@ export default function Publicaciones() {
         imagenPublicaciones_tercera
         ){
         if (!descripcionPublicaciones || !imagenPublicaciones_primera){
-            alert("Campo descripcion obligatorio / Primera Imagen Obligatoria");
+            toast.error("Campo descripcion obligatorio / Primera Imagen Obligatoria");
             return;
         }
         try {
@@ -215,13 +206,13 @@ export default function Publicaciones() {
                 cache: "no-store"
             })
             if(!res.ok){
-                alert("Ha habido un problema en consultar al servidor , Consulte con el equipo de Soporte de NativeCode")
+                toast.error("Ha habido un problema al consultar el servidor. Consulte con el equipo de Soporte de NativeCode.")
             }else{
                 const data = await res.json();
                 if (data.resultado){
-                    alert('Se ha insertado una nueva publicacion con exito!');
+                    toast.success('Se ha insertado una nueva publicacion con exito!');
                 }else {
-                    alert('No se ha podido Insertar la NUEVA publicacion. Verifique que los campos obligatorios fueron ingresados.');
+                    toast.error('No se ha podido insertar la publicación. Verifique que los campos obligatorios fueron ingresados.');
                 }
             }
         }catch (e) {
@@ -230,167 +221,282 @@ export default function Publicaciones() {
     }
 
 
-    async function subirImagenCloudinary(e) {
-        e.preventDefault();
-        if (!file) {
-            alert("Selecciona un archivo primero");
+    // Nuevo: manejar selección de archivos dependiendo del id de publicación seleccionado
+    function handleFileChange(e) {
+        const files = Array.from(e.target.files || []);
+        // Si la publicación seleccionada no es la 10 -> solo 1 imagen permitida
+        if (id_publicaciones && Number(id_publicaciones) !== 10) {
+            if (files.length > 1) {
+                toast('Solo se permite 1 imagen para esta publicación. Se usará la primera seleccionada.', {icon: '⚠️'});
+            }
+            setfile(files.slice(0, 1));
             return;
         }
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", UPLOAD_PRESET);
-
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!res.ok) {
-            alert("Error subiendo la imagen");
-            return;
+        // Si no hay id o si id === 10, permitir hasta 3 imágenes
+        if (files.length > 3) {
+            toast('Has seleccionado más de 3 imágenes. Se usarán las primeras 3.', {icon: '⚠️'});
         }
-        const data = await res.json();
-        setUrl(data.secure_url); // Guarda la URL de la imagen subida
+        setfile(files.slice(0, 3));
     }
+
+    // Nuevo: controlar el archivo de inserción (solo 1 imagen)
+    function handleNewFileChange(e) {
+        const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+        setNewFile(f);
+        if (f) {
+            try{
+                const preview = URL.createObjectURL(f);
+                setNewPreview(preview);
+            }catch(err){
+                setNewPreview(null);
+            }
+        } else {
+            setNewPreview(null);
+        }
+    }
+
+    async function handleInsertSubmit(e){
+        e.preventDefault();
+        if (!newDescripcion || !newFile){
+            toast.error('Descripción e imagen son obligatorios para insertar');
+            return;
+        }
+        if (!CLOUD_NAME || !UPLOAD_PRESET){
+            toast.error('Faltan variables de entorno de Cloudinary');
+            return;
+        }
+        setIsInserting(true);
+        try{
+            let toUpload = newFile;
+            if (toUpload.size > MAX_UPLOAD_SIZE){
+                const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
+                if (compressed) toUpload = new File([compressed], (newFile.name || 'image') + '.jpg', {type: 'image/jpeg'});
+            }
+            if (toUpload.size > MAX_UPLOAD_SIZE){
+                toast.error('La imagen excede 10MB incluso tras compresión');
+                setIsInserting(false);
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', toUpload);
+            formData.append('upload_preset', UPLOAD_PRESET);
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            if (!res.ok){
+                const errText = await res.text();
+                console.error('Error subiendo nueva imagen a Cloudinary:', res.status, errText);
+                toast.error('Error subiendo imagen a Cloudinary');
+                setIsInserting(false);
+                return;
+            }
+            const data = await res.json();
+            const imageUrl = data.secure_url;
+            // Llamar a insertarPublicacion (usa la función existente)
+            await insertarPublicacion(newDescripcion, imageUrl, "", "");
+            await listarPublicaciones();
+            setNewDescripcion("");
+            setNewFile(null);
+            if (newPreview) {
+                URL.revokeObjectURL(newPreview);
+                setNewPreview(null);
+            }
+            toast.success('Publicación insertada correctamente');
+        }catch(err){
+            console.error(err);
+            toast.error('Error al insertar publicación');
+        }finally{
+            setIsInserting(false);
+        }
+    }
+
+     // Ajuste: quitar selected del option para evitar warning de React controlado
+     useEffect(() => {
+         listarPublicaciones();
+     }, []);
 
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-10">
-            <section className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Actualizar publicación</h2>
-              <form
+            {/* Toaster global para esta página */}
+            <Toaster position="top-right" reverseOrder={false} />
+            {/* FORMULARIOS COMPACTOS: Actualizar e Insertar, lado a lado en pantallas medianas+ */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Actualizar publicación */}
+              <section className="rounded-2xl border bg-white p-6 shadow-sm">
+                <h2 className="text-base sm:text-lg font-semibold mb-4">Actualizar publicación</h2>
+
+                {/* Selector de publicación (antes estaba en "Administrar publicaciones") */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Selecciona una publicación</label>
+                  <select
+                    className="border-2 border-gray-200 w-full rounded-xl px-3 h-10 focus:outline-none focus:border-rose-500"
+                    value={id_publicaciones}
+                    onChange={(e) => setId_publicaciones(e.target.value)}
+                  >
+                    <option value="" disabled>-- Selecciona una Publicacion --</option>
+                    {listaPublicaciones.map((publicaciones) => (
+                      <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
+                        {publicaciones.descripcionPublicaciones}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <form
                   onSubmit={async (e) => {
-                      e.preventDefault();
-                      setIsUploading(true);
-                      if (!file || file.length === 0) {
-                          setIsUploading(false);
-                          alert("Selecciona al menos una imagen");
-                          return;
-                      }
-                      // Validación de variables de entorno requeridas para Cloudinary
-                      if (!CLOUD_NAME || !UPLOAD_PRESET) {
-                        setIsUploading(false);
-                        console.error("Faltan variables de entorno para Cloudinary", {
-                          CLOUD_NAME: CLOUD_NAME || "NO DEFINIDO",
-                          UPLOAD_PRESET: UPLOAD_PRESET || "NO DEFINIDO",
+                    e.preventDefault();
+                    setIsUploading(true);
+                    if (!file || file.length === 0) {
+                      setIsUploading(false);
+                      toast.error("Selecciona al menos una imagen");
+                      return;
+                    }
+                    if (!CLOUD_NAME || !UPLOAD_PRESET) {
+                      setIsUploading(false);
+                      console.error("Faltan variables de entorno para Cloudinary", {
+                        CLOUD_NAME: CLOUD_NAME || "NO DEFINIDO",
+                        UPLOAD_PRESET: UPLOAD_PRESET || "NO DEFINIDO",
+                      });
+                      toast.error("No se puede subir la imagen: faltan variables de entorno (CLOUD_NAME o UPLOAD_PRESET).");
+                      return;
+                    }
+                    const uploadedUrls = [];
+                    for (const f of file) {
+                      let toUpload = f;
+
+                      if (toUpload.size > MAX_UPLOAD_SIZE) {
+                        console.warn("Imagen supera 10MB, intentando comprimir...", {
+                          nombre: toUpload.name,
+                          sizeMB: (toUpload.size / (1024*1024)).toFixed(2)
                         });
-                        alert("No se puede subir la imagen: faltan variables de entorno (CLOUD_NAME o UPLOAD_PRESET).");
+                        const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
+                        if (compressed && compressed.size < toUpload.size) {
+                          toUpload = new File([compressed], (f.name || "image") + ".jpg", { type: "image/jpeg" });
+                          console.info("Imagen comprimida", {
+                            nuevaSizeMB: (toUpload.size / (1024*1024)).toFixed(2)
+                          });
+                        }
+                      }
+
+                      if (toUpload.size > MAX_UPLOAD_SIZE) {
+                        setIsUploading(false);
+                        toast.error("La imagen excede 10 MB incluso tras compresión. Por favor, súbela con menor resolución o peso.");
                         return;
                       }
-                      const uploadedUrls = [];
-                      for (const f of file) {
-                          let toUpload = f;
 
-                          // Si supera el límite, intentamos comprimir/redimensionar
-                          if (toUpload.size > MAX_UPLOAD_SIZE) {
-                            console.warn("Imagen supera 10MB, intentando comprimir...", {
-                              nombre: toUpload.name,
-                              sizeMB: (toUpload.size / (1024*1024)).toFixed(2)
-                            });
-                            const compressed = await downscaleImage(toUpload, 1600, 1600, 0.82);
-                            if (compressed && compressed.size < toUpload.size) {
-                              toUpload = new File([compressed], (f.name || "image") + ".jpg", { type: "image/jpeg" });
-                              console.info("Imagen comprimida", {
-                                nuevaSizeMB: (toUpload.size / (1024*1024)).toFixed(2)
-                              });
-                            }
-                          }
+                      const formData = new FormData();
+                      formData.append("file", toUpload);
+                      formData.append("upload_preset", UPLOAD_PRESET);
 
-                          // Si aún excede el máximo, informamos y detenemos
-                          if (toUpload.size > MAX_UPLOAD_SIZE) {
-                            setIsUploading(false);
-                            alert("La imagen excede 10 MB incluso tras compresión. Por favor, súbela con menor resolución o peso.");
-                            return;
-                          }
-
-                          const formData = new FormData();
-                          formData.append("file", toUpload);
-                          formData.append("upload_preset", UPLOAD_PRESET);
-
-                          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-                            method: "POST",
-                            body: formData,
-                          });
-                          if (!res.ok) {
-                            setIsUploading(false);
-                            const errText = await res.text();
-                            console.error("Error subiendo una imagen a Cloudinary:", res.status, errText);
-                            alert("Error subiendo una imagen. Revisa en Cloudinary que el UPLOAD_PRESET sea 'unsigned' y que el CLOUD_NAME sea correcto.");
-                            return;
-                          }
-                          const data = await res.json();
-                          uploadedUrls.push(data.secure_url);
+                      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+                        method: "POST",
+                        body: formData,
+                      });
+                      if (!res.ok) {
+                        setIsUploading(false);
+                        const errText = await res.text();
+                        console.error("Error subiendo una imagen a Cloudinary:", res.status, errText);
+                        toast.error("Error subiendo una imagen. Revisa en Cloudinary que el UPLOAD_PRESET sea 'unsigned' y que el CLOUD_NAME sea correcto.");
+                        return;
                       }
-                      // Llama al método de actualización
-                      await actuzalizarPublicaciones(
-                          descripcionPublicaciones,
-                          uploadedUrls[0] || "",
-                          uploadedUrls[1] || "",
-                          uploadedUrls[2] || "",
-                          id_publicaciones
-                      );
-                      await listarPublicaciones(); // Para refrescar la lista
-                      // Limpieza de estados tras actualización (excepto id_publicaciones)
-                      setfile([]);
-                      setDescripcionPublicaciones("");
-                      setImagenPublicaciones_primera("");
-                      setImagenPublicaciones_segunda("");
-                      setImagenPublicaciones_tercera("");
-                      setIsUploading(false);
+                      const data = await res.json();
+                      uploadedUrls.push(data.secure_url);
+                    }
+                    await actuzalizarPublicaciones(
+                      descripcionPublicaciones,
+                      uploadedUrls[0] || "",
+                      uploadedUrls[1] || "",
+                      uploadedUrls[2] || "",
+                      id_publicaciones
+                    );
+                    await listarPublicaciones();
+                    setfile([]);
+                    setDescripcionPublicaciones("");
+                    setIsUploading(false);
                   }}
-              >
-                  <input
+                  className="space-y-4"
+                >
+                  <div className="space-y-3">
+                    <input
                       type="text"
                       name="descripcionPublicaciones"
                       value={descripcionPublicaciones || ""}
                       onChange={(e) => setDescripcionPublicaciones(e.target.value)}
                       className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 focus:outline-none focus:border-emerald-500"
                       placeholder="Nueva descripción"
-                  />
-                  <br /><br />
-                  <input
+                    />
+                    <input
                       type="file"
                       accept="image/*"
                       multiple
-                      onChange={e => setfile(Array.from(e.target.files).slice(0, 3))}
-                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-50 hover:file:bg-emerald-100"
-                  />
-                  {isUploading && (
-                    <div className="mt-2 flex items-center gap-2 text-blue-600 text-sm">
-                      <span className="inline-block h-4 w-4 border-2 border-blue-300 border-t-transparent rounded-full animate-spin" />
-                      <span>Subiendo imagen a la nube...</span>
+                      onChange={handleFileChange}
+                      className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 file:mr-3 file:py-2 file:px-3 file:rounded-2xl file:border-0 file:bg-blue-50 hover:file:bg-blue-100"
+                    />
+                    <div className="text-xs text-gray-500">
+                      {id_publicaciones && Number(id_publicaciones) !== 10 ? (
+                        <span>Esta publicación admite una sola imagen.</span>
+                      ) : (
+                        <span>Puede subir hasta 3 imágenes (si no selecciona publicación, por defecto se permiten hasta 3).</span>
+                      )}
                     </div>
-                  )}
-                  <br /><br />
-                  <button
-                      className={`inline-flex items-center justify-center h-10 px-5 rounded-xl border-2 font-medium transition-colors ${isUploading ? "border-emerald-200 bg-emerald-100 text-emerald-400 cursor-not-allowed" : "border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-500 hover:text-white"}`}
+
+                    {isUploading && (
+                      <div className="mt-1 flex items-center gap-2 text-blue-600 text-sm">
+                        <span className="inline-block h-4 w-4 border-2 border-blue-300 border-t-transparent rounded-full animate-spin" />
+                        <span>Subiendo imagen a la nube...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      className={`inline-flex items-center justify-center h-10 px-5 rounded-2xl font-medium shadow-sm transition ${isUploading ? "bg-blue-100 text-blue-500 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
                       type="submit"
                       disabled={isUploading}
-                  >
-                      Actualizar Publicación
-                  </button>
-              </form>
-            </section>
+                    >
+                      Actualizar publicación
+                    </button>
+                  </div>
+                </form>
+              </section>
 
-            <section className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Administrar publicaciones</h2>
-              <div className="flex flex-wrap items-center gap-3">
-                <select
-                    className="border-2 border-gray-200 w-80 rounded-xl px-3 h-10 focus:outline-none focus:border-rose-500"
-                    value={id_publicaciones}
-                    onChange={(e) => setId_publicaciones(e.target.value)}
-                >
-                    <option value="" disabled selected>-- Selecciona una Publicacion --</option>
-                    {listaPublicaciones.map((publicaciones) => (
-                        <option value={publicaciones.id_publicaciones} key={publicaciones.id_publicaciones}>
-                            {publicaciones.descripcionPublicaciones}
-                        </option>
-                    ))}
-                </select>
-
-              </div>
-            </section>
+              {/* Insertar nueva publicación */}
+              <section className="rounded-2xl border bg-white p-6 shadow-sm">
+                <h2 className="text-base sm:text-lg font-semibold mb-4">Insertar nueva publicación (1 imagen)</h2>
+                <form onSubmit={handleInsertSubmit} className="space-y-4">
+                  <input
+                    type="text"
+                    className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 focus:outline-none focus:border-emerald-500"
+                    placeholder="Descripción"
+                    value={newDescripcion}
+                    onChange={(e) => setNewDescripcion(e.target.value)}
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleNewFileChange}
+                    className="border-2 border-gray-200 rounded-xl w-full h-10 px-3 file:mr-3 file:py-2 file:px-3 file:rounded-2xl file:border-0 file:bg-blue-50 hover:file:bg-blue-100"
+                  />
+                  {newPreview && (
+                    <div className="w-40 h-40 overflow-hidden rounded-lg">
+                      <img src={newPreview} alt="preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={isInserting}
+                      className={`inline-flex items-center justify-center h-10 px-5 rounded-2xl font-medium shadow-sm transition ${isInserting ? "bg-blue-100 text-blue-500 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
+                    >
+                      {isInserting ? "Insertando..." : "Insertar publicación"}
+                    </button>
+                  </div>
+                </form>
+              </section>
+            </div>
 
             <section aria-labelledby="publications-title" className="space-y-4">
               <h2 id="publications-title" className="text-2xl font-semibold tracking-tight">Publicaciones</h2>
@@ -405,20 +511,48 @@ export default function Publicaciones() {
                       </div>
                       <div className="grid grid-cols-3 gap-2 p-4 pt-0">
                         <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
-                          <img src={publicaciones.imagenPublicaciones_primera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          {publicaciones.imagenPublicaciones_primera ? (
+                            <img src={publicaciones.imagenPublicaciones_primera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-gray-300">No image</div>
+                          )}
                         </div>
                         <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
-                          <img src={publicaciones.imagenPublicaciones_segunda} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          {publicaciones.imagenPublicaciones_segunda ? (
+                            <img src={publicaciones.imagenPublicaciones_segunda} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-gray-300">No image</div>
+                          )}
                         </div>
                         <div className="aspect-square overflow-hidden rounded-lg bg-gray-50">
-                          <img src={publicaciones.imagenPublicaciones_tercera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          {publicaciones.imagenPublicaciones_tercera ? (
+                            <img src={publicaciones.imagenPublicaciones_tercera} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-gray-300">No image</div>
+                          )}
                         </div>
+                      </div>
+                      <div className="p-4 flex gap-3">
+                        <button
+                          onClick={async () => {
+                            if (Number(publicaciones.id_publicaciones) === 10) {
+                              toast.error('No se puede eliminar la publicación con id 10');
+                              return;
+                            }
+                            if (!confirm('¿Deseas eliminar esta publicación?')) return;
+                            await eliminarPublicacion(publicaciones.id_publicaciones);
+                          }}
+                          className={`inline-flex items-center justify-center px-3 py-2 rounded-2xl text-white text-sm font-medium shadow-sm transition ${Number(publicaciones.id_publicaciones) === 10 ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
+                          disabled={Number(publicaciones.id_publicaciones) === 10}
+                        >Eliminar</button>
                       </div>
                     </article>
                   ))}
                 </div>
               )}
             </section>
+
+
         </div>)
 
 
