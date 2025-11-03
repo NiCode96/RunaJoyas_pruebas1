@@ -31,9 +31,12 @@ export default function edicionPagina() {
     const [primerParrafo, setprimerParrafo] = useState("");
     const [segundoParrafo, setsegundoParrafo] = useState("");
 
+    const API = process.env.NEXT_PUBLIC_API_URL;
+
     async function cargarTitulos() {
         try {
-            const res = await fetch("http://localhost:3001/titulo");
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo`);
             if (!res.ok) {
                 throw new Error(
                     "Problema en consulta a base de datos contacte equipo de soporte"
@@ -130,7 +133,8 @@ export default function edicionPagina() {
 
     async function cargarTextos() {
         try {
-            const res = await fetch("http://localhost:3001/textos");
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/textos`);
             if (!res.ok) {
                 throw new Error(
                     "Problema en consulta a base de datos contacte equipo de soporte"
@@ -185,7 +189,8 @@ export default function edicionPagina() {
         e.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/titulo", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nuevoTitulo }),
@@ -208,7 +213,8 @@ export default function edicionPagina() {
         e.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/titulo/subtitulo", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo/subtitulo`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nuevoSubtitulo }),
@@ -234,7 +240,8 @@ export default function edicionPagina() {
             return;
         }
         try {
-            const res = await fetch("http://localhost:3001/titulo/sobrenosotros", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo/sobrenosotros`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -258,7 +265,8 @@ export default function edicionPagina() {
         evento.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/titulo/proyectos", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo/proyectos`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nuevoTituloProyecto }),
@@ -282,7 +290,8 @@ export default function edicionPagina() {
         evento.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/titulo/contacto", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo/contacto`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contactoTitulo }),
@@ -302,7 +311,8 @@ export default function edicionPagina() {
         event.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/textos/texto1", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/textos/texto1`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ texto1 }),
@@ -323,7 +333,8 @@ export default function edicionPagina() {
         event.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:3001/textos/texto2", {
+            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/textos/texto2`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ texto2 }),
@@ -343,7 +354,8 @@ export default function edicionPagina() {
     // Config
     async function cargarConfiguracion() {
         try {
-            const response = await fetch("http://localhost:3001/config");
+            // Usar la constante API en lugar de URL hardcodeada
+            const response = await fetch(`${API}/config`);
             if (response.ok) {
                 const config = await response.json();
                 setFotoPerfil(config.fotoPerfil || "nube.png");
