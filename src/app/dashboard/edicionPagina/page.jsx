@@ -30,7 +30,7 @@ export default function edicionPagina() {
     const [tituloContacto, settituloContacto] = useState("");
     const [primerParrafo, setprimerParrafo] = useState("");
     const [segundoParrafo, setsegundoParrafo] = useState("");
-
+    
     const API = process.env.NEXT_PUBLIC_API_URL;
 
     async function cargarTitulos() {

@@ -46,7 +46,7 @@ export default function NavbarDashboard() {
             style={{ textDecoration: 'none', color: 'inherit' }}
             sx={{ fontFamily: 'Michroma, sans-serif', fontWeight: 800, letterSpacing: '.12rem', color: '#0A2540' }}
           >
-            NativeCode — Dashboard
+         RunaJoyas
           </Typography>
 
           {/* Empuja el bloque de navegación a la derecha */}

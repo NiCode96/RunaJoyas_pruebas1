@@ -122,10 +122,10 @@ function ResponsiveAppBar() {
                      >
                          <Box sx={{ height: 40 }}>
                              <Image
-                                 src="/runaJoyas.png"
+                                 src="/runaJoyasIcono.png"
                                  alt="Runa Joyas"
                                  width={160}
-                                 height={60}
+                                 height={80}
                                  priority
                                  style={{ height: '100%', width: 'auto' }}
                              />
@@ -154,7 +154,7 @@ function ResponsiveAppBar() {
                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
                                  <Box sx={{ height: 28 }}>
                                      <Image
-                                         src="/runaJoyas.png"
+                                         src="/runaJoyasIcono.png"
                                          alt="Runa Joyas"
                                          width={280}
                                          height={70}
@@ -228,7 +228,7 @@ function ResponsiveAppBar() {
                      >
                          <Box sx={{ height: 28 }}>
                              <Image
-                                 src="/runaJoyas.png"
+                                 src="/runaJoyasIcono.png"
                                  alt="Runa Joyas"
                                  width={120}
                                  height={28}

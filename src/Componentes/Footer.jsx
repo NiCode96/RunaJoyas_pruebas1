@@ -2,6 +2,13 @@
 import React from "react";
 import Image from "next/image";
 
+import { Michroma } from "next/font/google";
+
+const michroma = Michroma({
+    weight: "400",
+    subsets: ["latin"],
+});
+
 function Icon({ name, className = "w-6 h-6" }) {
   const icons = {
     instagram: (
@@ -60,24 +67,20 @@ export default function Footer() {
       {/* REDES SOCIALES */}
       <section className="w-full border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-center gap-6">
-          {[
-            { href: "https://www.instagram.com/runajoyas", icon: "instagram", label: "Instagram" },
-            { href: "https://www.facebook.com/runajoyas", icon: "facebook", label: "Facebook" },
-            { href: "https://www.tiktok.com/@runajoyas", icon: "tiktok", label: "TikTok" },
-            { href: "https://www.linkedin.com/", icon: "linkedin", label: "LinkedIn" },
-            { href: "https://github.com/", icon: "github", label: "GitHub" },
-          ].map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600/80 transition-transform no-underline hover:text-gray-900 hover:-translate-y-0.5"
-              aria-label={s.label}
-            >
-              <Icon name={s.icon} className="w-6 h-6" />
-            </a>
-          ))}
+          <a
+            href="https://www.instagram.com/runajoyas"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="group inline-flex items-center justify-center p-2 rounded-full transition-all no-underline hover:scale-105 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-500"
+          >
+            <span className="sr-only">Instagram</span>
+            <div className="rounded-full p-0.5 bg-white">
+              <Image src="/insta.png" alt="Instagram Runa Joyas" width={150} height={150}
+              className="p-2"
+              />
+            </div>
+          </a>
         </div>
       </section>
 
@@ -137,7 +140,7 @@ export default function Footer() {
             {/* CONTACTO */}
             <div className="flex flex-col gap-3">
               <h6 className="text-gray-900 tracking-wide uppercase text-sm font-bold mb-0 leading-tight">Contacto</h6>
-              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="home" className="w-4 h-4" /> Valdivia Centro, Picarte, Región de Los Ríos, Chile</p>
+              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="home" className="w-4 h-4" /> Valdivia Chile</p>
               <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="envelope" className="w-4 h-4" /> ventas@runajoyas.cl</p>
               <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="phone" className="w-4 h-4" /> +56 9 9876 5432</p>
               <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="clock" className="w-4 h-4" /> Lun–Sáb 10:00–19:00</p>
@@ -193,25 +196,11 @@ export default function Footer() {
       <div className="border-top border-gray-200 mt-8">
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
           {/* Removed the "Página desarrollada por" text per request */}
-          <a
-            href="https://nativecode.cl/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-600 no-underline hover:text-gray-900 text-sm tracking-wide"
-            title="Aplicación desarrollada por NativeCode.cl"
-          >
-            Aplicación desarrollada por <span className="text-gray-900">NativeCode.cl</span>
-          </a>
-          <div className="flex items-center gap-4">
-            <a href="https://www.instagram.com/runajoyas" target="_blank" rel="noopener noreferrer" className="text-gray-600/80 transition-all no-underline hover:text-gray-900 hover:-translate-y-0.5" aria-label="Instagram">
-              <Icon name="instagram" />
-            </a>
-            <a href="https://www.facebook.com/runajoyas" target="_blank" rel="noopener noreferrer" className="text-gray-600/80 transition-all no-underline hover:text-gray-900 hover:-translate-y-0.5" aria-label="Facebook">
-              <Icon name="facebook" />
-            </a>
-            <a href="https://www.tiktok.com/@runajoyas" target="_blank" rel="noopener noreferrer" className="text-gray-600/80 transition-all no-underline hover:text-gray-900 hover:-translate-y-0.5" aria-label="TikTok">
-              <Icon name="tiktok" />
-            </a>
+          <p className={`${michroma.className} text-gray-800 text-xs tracking-wide select-none text-center md:text-left flex items-center gap-1`}>
+            <span className="text-base">©</span> Desarrollado por NativeCode
+          </p>
+          <div className="flex items-center">
+
           </div>
         </div>
       </div>

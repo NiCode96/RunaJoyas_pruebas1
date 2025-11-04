@@ -11,9 +11,9 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
   return (
     <Card
       sx={{
+        width: 220, // ancho fijo para uniformidad
         maxWidth: 320,
-        width: '100%',
-        height: '100%',
+        height: 300, // altura fija para uniformidad
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 3,
@@ -24,17 +24,15 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
         textDecoration: 'none'
       }}
     >
-      {/* Imagen cuadrada y responsiva: usamos un contenedor con paddingTop 100% para mantener ratio 1:1 */}
+      {/* Imagen cuadrada y responsiva: usamos un contenedor con altura fija para mantener uniformidad */}
       <CardMedia
         component="div"
         sx={{
-          pt: '100%', // 1:1 aspect ratio (cuadrada)
+          height: 200, // altura fija para todas las imágenes
           backgroundImage: imagenProducto ? `url(${imagenProducto})` : 'linear-gradient(180deg,#f3f4f6,#e5e7eb)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          // evitar que la imagen empuje el resto del contenido
-          minHeight: 0,
+          backgroundRepeat: 'no-repeat'
         }}
         title={titulo}
       />

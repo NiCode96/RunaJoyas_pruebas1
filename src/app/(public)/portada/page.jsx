@@ -43,7 +43,7 @@ export default function Portada() {
     return(
         <div>
 
-            <section className="relative w-full overflow-hidden">
+            <section className="mt-14 relative w-full overflow-hidden">
                 <div className="w-full ">
                     {publicacion && (
                         <Carrusel
