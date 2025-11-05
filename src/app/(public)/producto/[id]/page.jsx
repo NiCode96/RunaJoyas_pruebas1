@@ -2,8 +2,22 @@
 import {useState, useEffect} from "react";
 import {useParams} from "next/navigation";
 import Carrusel from "@/Componentes/Carrusel";
+import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+import {toast} from "react-hot-toast";
+import Link from "next/link";
+
 
 export default function ProductoDetalle() {
+
+
+    //USO DE CARRITO GLOBAL DE CONTEXT PARA EL USO EN TODA LA APLICACION DE ARRAY DE OBJETOS GLOBALES
+    const [carrito, setCarrito] = useCarritoGlobal();
+
+    function agregarAlCarrito(productoSeleccionado) {
+       setCarrito(arrayProductosPrevios => [...arrayProductosPrevios, productoSeleccionado])
+        toast.success("Producto añadido al carrito de compras!")
+    }
+
 
     //USE STATE PARA ALMACENAR EL OBJETO SELECCIONADO CON USESTATE
     const [producto, setProducto] = useState({});
@@ -45,6 +59,16 @@ useEffect(() => {
     seleccionarProductoPorID(id_producto);
 }, [id_producto]);
 
+
+
+
+
+    let booleanSinStock = false
+
+    if (producto.cantidadStock < 1){
+        booleanSinStock = true;
+    }
+
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 mt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -66,11 +90,16 @@ useEffect(() => {
                   {producto.tituloProducto}
                 </h1>
 
+         <div className="flex ">
+             <label className="font-bold">Cantidad en Stock:</label>
+             <p className="ml-2  font-bold">{producto.cantidadStock}</p>
+         </div>
+
                 {/* PRECIO */}
                 <div className="flex items-baseline gap-3">
                   <span className="text-sm uppercase tracking-wider text-slate-500">Valor</span>
                   <label className="text-2xl md:text-3xl font-bold text-blue-600">
-                    {producto.valorProducto}
+                   $ {producto.valorProducto}
                   </label>
                 </div>
 
@@ -79,53 +108,48 @@ useEffect(() => {
               {producto.descripcionProducto}
             </p>
 
+
                 {/* SEPARADOR SUTIL */}
                 <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-                {/* SELECTOR DE CANTIDAD */}
-                <div className="space-y-3">
-                  <h2 className="text-sm font-medium tracking-wide text-slate-700">Cantidad</h2>
-                  <div className="flex items-center gap-4">
-                    <div className="inline-flex items-center rounded-full border border-slate-200 bg-white shadow-sm">
-                      <button
-                        type="button"
-                        onClick={decrementar}
-                        aria-label="Disminuir"
-                        className="w-10 h-10 grid place-items-center text-base rounded-l-full hover:bg-slate-50 active:scale-[0.98] transition"
-                      >
-                        −
-                      </button>
-                      <span className="min-w-12 text-center text-sm font-medium text-slate-900 select-none">
-                        {cantidad}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={incrementar}
-                        aria-label="Aumentar"
-                        className="w-10 h-10 grid place-items-center text-base rounded-r-full hover:bg-slate-50 active:scale-[0.98] transition"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <span className="text-xs text-slate-500">Selecciona cuántas unidades quieres</span>
-                  </div>
-                </div>
+
 
                 {/* ACCIONES */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button
+
+
+
+                <button
                     type="button"
-                    className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/20 ring-1 ring-emerald-700/20 transition"
+                    disabled={booleanSinStock}
+                    onClick={() => agregarAlCarrito(producto)}
+                    className="
+    inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white
+    bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+    shadow-lg shadow-blue-600/20 ring-1 ring-emerald-700/20 transition
+    disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-500 disabled:active:bg-gray-500
+"
                   >
-                    Añadir al carrito
+                    Añadir Unidad al carrito
                   </button>
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-950 active:bg-black shadow-lg shadow-slate-900/20 ring-1 ring-black/10 transition"
-                  >
-                    Comprar ahora
-                  </button>
+
+                    <Link href="/carrito">
+                        <button
+
+                            type="button"
+                            className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-950 active:bg-black shadow-lg shadow-slate-900/20 ring-1 ring-black/10 transition"
+                        >
+                            Ir al carrito
+                        </button>
+                    </Link>
+
                 </div>
+
+
+
+
+
+
 
                 {/* BENEFICIOS / SELLOS DE CONFIANZA */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">

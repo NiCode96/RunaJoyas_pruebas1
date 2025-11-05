@@ -26,9 +26,11 @@ import Divider from '@mui/material/Divider';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+
 // Enlaces externos (placeholder) para Más Vendidos
 // const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
 const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
@@ -36,6 +38,10 @@ const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO:
 
 
 function ResponsiveAppBar() {
+
+    const [carrito, setCarrito] = useCarritoGlobal();
+    let cantidadProductosCarrito = carrito.length ?? 0;
+
 
     const [listaCategorias, setListaCategorias] = React.useState([]);
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -294,11 +300,13 @@ function ResponsiveAppBar() {
                      {/* Acciones a la derecha: carrito de compras */}
                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
                          <Tooltip title="Carrito">
-                             <IconButton size="large" color="inherit" aria-label="Carrito de compras">
-                                 <Badge badgeContent={0} showZero overlap="circular" color="primary">
-                                     <ShoppingCartOutlinedIcon />
-                                 </Badge>
-                             </IconButton>
+<Link href="/carrito">
+    <IconButton size="large" color="inherit" aria-label="Carrito de compras">
+        <Badge badgeContent={cantidadProductosCarrito} showZero overlap="circular" color="primary">
+            <ShoppingCartOutlinedIcon />
+        </Badge>
+    </IconButton>
+</Link>
                          </Tooltip>
                      </Box>
                  </Toolbar>
