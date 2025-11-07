@@ -435,16 +435,11 @@ async function marcarOfertaProductos(id_producto) {
         console.error({ message: "Id del producto no proporcionado" });
         return null;
       }
-
-
-
       const res = await fetch(`${API}/producto/${id_producto}`, {
         method: "GET",
         headers: { Accept: "application/json" },
         cache: "no-store",
       });
-
-
       if (!res.ok) {
         console.error({ message: "Error al cargar producto" });
         return null;
@@ -464,6 +459,9 @@ async function marcarOfertaProductos(id_producto) {
       console.error("Problema al cargar producto especifico");
     }
   }
+
+
+
   //FUNCION PARA CARGAR TODOS LOS PRODUCTOS
   async function cargarProductos() {
     try {

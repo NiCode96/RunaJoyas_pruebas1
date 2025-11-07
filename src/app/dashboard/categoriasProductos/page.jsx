@@ -1,6 +1,7 @@
 "use client"
 
 import {useState, useEffect} from "react";
+import ToasterClient from "@/Componentes/ToasterClient";
 import { toast } from 'react-hot-toast';
 
 
@@ -26,25 +27,21 @@ try {
     })
 
     if(!res.ok){
-        console.error("No fue posible actualziar la categoria seleccionada")
-        return {success: false};
+        return toast.error('No fue posible actualziar la categoria seleccionada. Debe seleccionar la categoria que desea actualizar');
     }
     const data = await res.json();
 
     if(data.message === true){
         await seleccionarCategorias();
         setdescripcionCategoria("");
-        toast.success("Categoría actualizada correctamente");
-        return {success: true};
+        return toast.success("Categoría actualizada correctamente");
     }else{
         toast.error("Categoría no se pudo actualizar, contacte a Soporte Informático")
     }
 
-
 }catch (error) {
-    toast.error("Ha ocurrido un error: contacte a Soporte Informático: " + error.message);
     console.error(error);
-
+    return toast.error("Ha ocurrido un error: contacte a Soporte Informático: " + error.message);
 } finally {
     setIsLoading(false);
 }
@@ -63,21 +60,18 @@ async function eliminarCategorias(id_categoriaProducto) {
             body: JSON.stringify({id_categoriaProducto})
         })
         if(!res.ok) {
-            console.error("No fue posible eliminar la categoria");
-            return{success: false};
+        return  toast.error("No fue posible eliminar el categoria");
         }
         const data = await res.json();
         if(data.message === true){
-            toast.success("Categoría eliminada correctamente");
             setdescripcionCategoria("");
             await seleccionarCategorias();
-            return {success: true};
+            return toast.success("Categoría eliminada correctamente");
         }else {
-            toast.error("No fue posible eliminar la categoría");
-            return {success: false};
+            return toast.error("No fue posible eliminar la categoría");
         }
     }catch(err) {
-        console.log(err);
+        return toast.error("No fue posible eliminar la categoría contacte a soporte informatico de NativeCode");
     } finally {
         setIsLoading(false);
     }
@@ -100,16 +94,14 @@ async function insertarCategoria(event) {
             body: JSON.stringify({ descripcionCategoria })
         });
         if (!res.ok) {
-            console.error("No fue posible ingresar categoria desde el froned / conflicto en el fetch");
-            return;
+       return toast.error("Debe escribir el titulo de la categoria. No es posible insertar categorias en blanco.");
         }
 
         const data = await res.json();
         if (data) {
-            toast.success("Categoría ingresada correctamente");
              setdescripcionCategoria("");
              await seleccionarCategorias();
-             return data;
+             return toast.success("Categoría ingresada correctamente");
          }
      }catch (error) {
          console.log(error);
@@ -134,13 +126,14 @@ async function seleccionarCategoriaEspecifica(id_categoriaProducto) {
             cache: 'no-store',
         })
         if (!res.ok) {
-            console.error('no fue posible seleccionar la categoria especifica');
-            return null;
+            return toast.error('No fue posible seleccionar la categoria especifica contacte a soporte informatico de NativeCode');
+
         }
         const data = await res.json();
         setdescripcionCategoria(data.descripcionCategoria);
         setCategoriaSelecionado(data);
         console.log(data);
+        return toast.success('Se ha seleccionado de manera correcta una categoria para ser editada!')
     }catch (e) {
         console.error(e);
     }
@@ -184,6 +177,7 @@ useEffect(() => {
 
 return (
   <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/70 p-4 md:p-8">
+      <ToasterClient></ToasterClient>
 
       <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200/80 bg-white/80 shadow-xl backdrop-blur-sm p-6 md:p-10">
 

@@ -6,7 +6,52 @@ import ToasterClient from "@/Componentes/ToasterClient";
 export default function GestionStock() {
     const API = process.env.NEXT_PUBLIC_API_URL;
 
+    const [productos, setProductos] = useState([])
     const [nuevoStock, setNuevoStock] = useState({});
+    const [productoSimilar, setProductoSimilar] = useState("");
+
+
+    async function buscarProductoSimilar(productoSimilar){
+        let tituloProducto = productoSimilar;
+
+        try {
+            const res = await fetch(`${API}/producto/buscarSimilar`,{
+                method: "POST",
+                headers:{
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({tituloProducto}),
+                mode: "cors"
+            })
+
+            if(!res.ok){
+                return toast.error("No se han encontrado similitudes por problemas tecnicos porfavor contacte al equipo de soporte de NativeCode.cl");
+            }else{
+
+                const data = await res.json();
+                if(Array.isArray(data)){
+                    setProductos(data)
+                }
+
+                if(data.length > 0){
+                    return toast.success("Se han encontrado similitudes")
+
+                }else {
+                    return toast.error("No Se han encontrado similitudes")
+                }
+
+            }
+
+        }catch (error) {
+            console.log(error);
+            return toast.error("Se ha producido un problema contacte a soporte informatico de NativeCode.cl");
+        }
+    }
+
+
+
+
 
     async function actualizarStock(cantidadStock,id_producto) {
         try {
@@ -40,7 +85,7 @@ export default function GestionStock() {
 
 
 
-    const [productos, setProductos] = useState([])
+
 
     async function listarProductos() {
         try {
@@ -55,7 +100,6 @@ export default function GestionStock() {
                 const dataProductos = await res.json();
                 setProductos(dataProductos);
             }
-
         }catch (error) {
             console.log(error)
         }
@@ -82,6 +126,40 @@ export default function GestionStock() {
               Administra el stock de tus productos de forma clara y profesional.
             </p>
           </header>
+
+            <div className="mb-8">
+              <div className="flex flex-col md:flex-row items-stretch gap-3">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={productoSimilar}
+                    onChange={(event) => setProductoSimilar(event.target.value)}
+                    placeholder="Buscar por título o palabra clave..."
+                    aria-label="Buscar similitudes de producto"
+                    className="w-full rounded-xl border border-slate-300 bg-white/80 px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 placeholder:text-slate-400"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    {/* simple magnifying glass icon */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                      <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => buscarProductoSimilar(productoSimilar)}
+                  className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-sky-700 to-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-sky-800 hover:to-sky-700 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-200"
+                >
+                  <span className="mr-2 hidden md:inline">Buscar</span>
+                  {/* search icon duplicated for button for consistency */}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                    <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">Ingresa un término y presiona <span className="font-medium text-slate-700">Buscar</span> para encontrar productos similares.</p>
+            </div>
 
           <div className="space-y-4">
             {productos.map((producto) => (

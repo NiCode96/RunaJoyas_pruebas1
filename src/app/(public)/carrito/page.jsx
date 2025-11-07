@@ -1,14 +1,19 @@
 "use client"
 import {useState, useEffect} from "react";
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+import {useObjetosPagosGlobales} from "@/ContextosGlobales/ObjetoPagarContext";
+import Link from "next/link";
+
 
 export  default function Carrito() {
 
     const [carrito, setCarrito] = useCarritoGlobal();
+    const [objetoDePago, setObjetoDePago] = useObjetosPagosGlobales();
 
 
 
     const productoCatidades = {};
+    let  totalPago = 0;
 
     for (const productos of carrito) {
         if (productoCatidades[productos.id_producto]) {
@@ -19,6 +24,20 @@ export  default function Carrito() {
     }
 
     const productosDelCarrito = Object.values(productoCatidades)
+
+    for (const producto of productosDelCarrito) {
+        totalPago += (producto.valorProducto * producto.cantidadVendida);
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -56,11 +75,16 @@ export  default function Carrito() {
           ))}
         </ul>
 
-          <button
-            className="mt-5 w-40 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-indigo-600 hover:to-blue-500"
-          >
-            Ir a Pagar
-          </button>
+          <label>Total a Pagar :</label>
+          <h1>$ {totalPago}</h1>
+
+<Link href="/formularioPago">
+    <button
+        className="mt-5 w-40 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-indigo-600 hover:to-blue-500"
+    >
+        Ir a Pagar
+    </button>
+</Link>
       </div>
     )
 }

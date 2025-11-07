@@ -104,7 +104,7 @@ export default function Publicaciones() {
                 if (resultado.message === "sindato"){
                     return  toast.error(' ❌ No fue posible actulizar la publicacion / Debe llenar los campos obligartirios');
                 }
-                if (resultado.message === true){
+                if (resultado.message === "true"){
                     return  toast.success(' ✅ Se ha actualizado con la publicacion de manera exitosa');
                 }
             }
@@ -209,10 +209,8 @@ export default function Publicaciones() {
                 toast.error("Ha habido un problema al consultar el servidor. Consulte con el equipo de Soporte de NativeCode.")
             }else{
                 const data = await res.json();
-                if (data.resultado){
+                if (data.message === "true" ){
                     toast.success('Se ha insertado una nueva publicacion con exito!');
-                }else {
-                    toast.error('No se ha podido insertar la publicación. Verifique que los campos obligatorios fueron ingresados.');
                 }
             }
         }catch (e) {
