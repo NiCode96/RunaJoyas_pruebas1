@@ -11,9 +11,17 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
   return (
     <Card
       sx={{
-        width: 220, // ancho fijo para uniformidad
+        width: {
+          xs: '100%',   // full width en celulares
+          sm: 260,      // tablets pequeñas
+          md: 220       // pantallas medianas y grandes
+        },
         maxWidth: 320,
-        height: 300, // altura fija para uniformidad
+        height: {
+          xs: 'auto',   // altura automática en celular
+          sm: 320,      // altura uniforme en tablet
+          md: 300       // altura original en escritorio
+        },
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 3,
@@ -28,7 +36,11 @@ export default function MediaCard({titulo, valor, descripcion, imagenProducto, b
       <CardMedia
         component="div"
         sx={{
-          height: 200, // altura fija para todas las imágenes
+          height: {
+            xs: 160,   // más pequeño en celulares
+            sm: 190,   // tablet
+            md: 200    // escritorio
+          },
           backgroundImage: imagenProducto ? `url(${imagenProducto})` : 'linear-gradient(180deg,#f3f4f6,#e5e7eb)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',

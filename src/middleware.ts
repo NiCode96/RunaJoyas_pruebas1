@@ -12,7 +12,9 @@ const ALLOWED_EMAILS = new Set([
     'nicolas.machucadev@gmail.com',
 ])
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
+export default clerkMiddleware((_auth, _req: NextRequest) => {
+    return NextResponse.next()
+    /*
     const pathname = req.nextUrl.pathname
 
     // LOG temporales para depuración (quitar en producción)
@@ -65,12 +67,9 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
         const url = new URL('/no-access', req.url)
         return NextResponse.redirect(url)
     }
-
+    */
 })
 
 export const config = {
-    matcher: [
-        // Ejecutar middleware solo para las rutas del dashboard y sus subrutas
-        '/dashboard/:path*'
-    ],
+    matcher: undefined,
 }
