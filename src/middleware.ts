@@ -1,3 +1,4 @@
+
 // TypeScript
 // archivo: `frontend/src/middleware.ts`
 import { clerkMiddleware, clerkClient, createRouteMatcher } from '@clerk/nextjs/server'
@@ -12,9 +13,7 @@ const ALLOWED_EMAILS = new Set([
     'nicolas.machucadev@gmail.com',
 ])
 
-export default clerkMiddleware((_auth, _req: NextRequest) => {
-    return NextResponse.next()
-    /*
+export default clerkMiddleware(async (auth, req: NextRequest) => {
     const pathname = req.nextUrl.pathname
 
     // LOG temporales para depuración (quitar en producción)
@@ -67,9 +66,12 @@ export default clerkMiddleware((_auth, _req: NextRequest) => {
         const url = new URL('/no-access', req.url)
         return NextResponse.redirect(url)
     }
-    */
+
 })
 
 export const config = {
-    matcher: undefined,
+    matcher: [
+        // Ejecutar middleware solo para las rutas del dashboard y sus subrutas
+        '/dashboard/:path*'
+    ],
 }

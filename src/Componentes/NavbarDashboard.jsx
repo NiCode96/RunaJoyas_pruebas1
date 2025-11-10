@@ -97,15 +97,7 @@ export default function NavbarDashboard() {
               Productos
             </Button>
 
-            <Button
-              component={Link}
-              href="/dashboard/edicionPagina"
-              color="inherit"
-              disableRipple
-              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
-            >
-              Edición Web
-            </Button>
+
           </Box>
 
           {/* Navegación Mobile (xs-sm) con botón de texto */}
