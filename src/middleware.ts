@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 const isProtectedRoute = createRouteMatcher(['/dashboard/:path*'])
 
 const ALLOWED_EMAILS = new Set([
-    'tm.nicolasmachuca@gmail.com',
+    'mariafernandadelmauro@gmail.com',
     'nicolas.machucadev@gmail.com',
 ])
 
