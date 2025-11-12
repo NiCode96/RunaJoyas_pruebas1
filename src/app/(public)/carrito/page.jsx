@@ -88,11 +88,11 @@ function actualizarValorUnidades(id_producto) {
         <h1 className="text-3xl font-bold text-gray-800 mb-8 border-b border-gray-200 pb-3">Tu Carrito</h1>
         <ul className="divide-y divide-gray-200 rounded-xl bg-white shadow-md">
 
-            <div className="sm:col-span-2">
+            <div className="ml-5 sm:col-span-2">
                 <p className="text-gray-500">Modificar Cantidad</p>
 
        <select
-         className="p-2 w-90 border-2 border-blue-600 rounded-lg"
+         className="p-2 w-70 md:w-100 border-2 border-blue-600 rounded-lg"
          value={idSeleccionado ?? ''}
          onChange={(e) => setIdSeleccionado(Number(e.target.value))}
        >
@@ -115,7 +115,7 @@ function actualizarValorUnidades(id_producto) {
 
                 <button
                   onClick={() => actualizarValorUnidades(idSeleccionado)}
-                  className="ml-5 border-2 rounded-lg border-blue-600 font-bold p-1 hover:bg-sky-100"
+                  className="ml-3 mt-3 w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-300 active:scale-95"
                 >
                   Actualizar
                 </button>
@@ -125,9 +125,9 @@ function actualizarValorUnidades(id_producto) {
 
 
           {productosDelCarrito.map((producto) => (
-            <li key={producto.id_producto} className="p-5 hover:bg-gray-50 transition-colors">
+            <li key={producto.id_producto} className="p-5  transition-colors">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-semibold text-gray-800">{producto.tituloProducto}</h2>
+                <h5 className="text-lg font-semibold text-gray-800">{producto.tituloProducto}</h5>
 
                 <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100 shadow-sm">
                   Codigo Producto: #{producto.id_producto}
