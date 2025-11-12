@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function MediaCardImage({ imagenProducto, tituloProducto, valorProducto }) {
   return (
-    <div className="relative w-[220px] h-[220px] overflow-hidden ">
+    <div className="relative w-[180px] h-[200px]  md:w-[200px] overflow-hidden ">
       <img
         src={imagenProducto}
         alt={tituloProducto}
