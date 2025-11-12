@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Michroma } from "next/font/google";
 
@@ -9,7 +10,7 @@ const michroma = Michroma({
     subsets: ["latin"],
 });
 
-function Icon({ name, className = "w-6 h-6" }) {
+function Icon({ name, className = "w-6 h-6 text-gray-700" }) {
   const icons = {
     instagram: (
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
@@ -66,141 +67,100 @@ export default function Footer() {
     <footer id="footer" className="text-gray-700 bg-white border-t border-gray-200 tracking-[0.01em]">
       {/* REDES SOCIALES */}
       <section className="w-full border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-center gap-6">
-          <a
-            href="https://www.instagram.com/runajoyas"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="group inline-flex items-center justify-center p-2 rounded-full transition-all no-underline hover:scale-105 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-500"
-          >
-            <span className="sr-only">Instagram</span>
-            <div className="rounded-full p-0.5 bg-white">
-              <Image src="/insta.png" alt="Instagram Runa Joyas" width={150} height={150}
-              className="p-2"
-              />
-            </div>
-          </a>
+        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-center gap-6">
+          <nav className="flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/runajoyas.cl?igsh=OTY2a3lka3lramtr"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="group rounded-full p-2 border-2 border-transparent hover:border-pink-400 bg-white shadow-sm hover:shadow-md transition-all duration-500 relative overflow-hidden"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-sm"></span>
+              <span className="relative z-10 flex items-center justify-center">
+                <Image src={"/insta.png"} alt={"instagram"} width={120} height={60} className="transition-transform duration-500 group-hover:scale-105" />
+              </span>
+            </a>
+          </nav>
         </div>
       </section>
 
       {/* BLOQUE DESCRIPTIVO */}
       <section className="w-full">
-        <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-[1fr_auto] items-start gap-4">
-          <div>
-            <h3 className="text-gray-900 text-lg font-bold leading-tight">Consulta por tu Joya Favorita</h3>
-            <p className="text-gray-600 text-sm mt-1">
-              Consulta sobre tus despachos, ¡nos aseguramos de que tu pedido llegue a tus manos!
-            </p>
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <div className="md:col-span-1">
+            <h3 className="text-gray-900 text-xl font-semibold leading-tight">Runa Joyas</h3>
+            <p className="text-gray-600 text-sm mt-2"></p>
+
+            <div className="mt-4 flex items-center gap-3">
+              <Icon name="phone" className="w-5 h-5 text-gray-700" />
+              <a href="tel:+56985937487" className="!text-gray-700 text-sm !no-underline hover:">+56 9 8593 7487</a>
+            </div>
+            <div className="mt-2 flex items-center gap-3">
+              <Icon name="envelope" className="w-5 h-5 text-gray-700" />
+              <a href="mailto:runajoyaschile@gmail.com" className="!text-gray-700 text-sm !no-underline hover:underline">runajoyaschile@gmail.com</a>
+            </div>
           </div>
-          <p className="text-gray-500 text-xs md:col-span-2">
-            Síguenos en redes sociales y no te pierdas nuestras promociones y concursos {" "}
-            <a href="#" className="no-underline text-gray-700 hover:text-gray-900">Link a red social de preferencia</a>.
-          </p>
-        </div>
-      </section>
 
-      {/* CUERPO PRINCIPAL */}
-      <section>
-        <div className="max-w-6xl mx-auto text-center md:text-left mt-2 md:mt-3 px-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-4 items-start">
-            {/* SOBRE NOSOTROS */}
-            <div className="flex flex-col gap-3">
-              <h6 className="text-gray-900 uppercase tracking-wide text-sm font-bold mb-0 flex items-center gap-2 leading-tight">
-                <Icon name="home" className="w-5 h-5" /> Runa Joyas
-              </h6>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Desde 1998, Runa Joyas crea piezas artesanales únicas que celebran la cultura andina. Calidad,
-                sostenibilidad y diseño auténtico para joyas que conectan generaciones.
-              </p>
-            </div>
+          <div className="md:col-span-1">
+            <h4 className="text-gray-900 font-semibold mb-3">Atención</h4>
+            <ul className="text-sm text-gray-600 space-y-2">
+              <li>Horario: Lun–Sáb 10:00–19:00</li>
+              <li>Envíos a todo Chile</li>
+              <li>Compra segura con Mercado Pago</li>
+            </ul>
 
-            {/* PRODUCTOS (oculto en móviles y tablets) */}
-            <div className="hidden lg:flex flex-col gap-3">
-              <h6 className="text-gray-900 uppercase tracking-wide text-sm font-bold mb-0 leading-tight">Productos</h6>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>Joyas</li>
-                <li>Collares</li>
-                <li>Pulseras</li>
-                <li>Aros</li>
-                <li>Accesorios</li>
-              </ul>
-            </div>
+          </div>
 
-            {/* ENLACES ÚTILES */}
-            <div className="hidden lg:flex flex-col gap-3">
-              <h6 className="text-gray-900 uppercase tracking-wide text-sm font-bold mb-0 leading-tight">Enlaces</h6>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>Categorías</li>
-                <li>Más vendidos</li>
-                <li>Ofertas</li>
-              </ul>
-            </div>
+          <div className="md:col-span-1">
+            <h4 className="text-gray-900 font-semibold mb-3">Enlaces</h4>
+            <ul className="text-sm text-gray-600 space-y-2">
+              <li><Link href="/catalogo" className="text-gray-900 !no-underline hover:text-blue-600">Catálogo</Link></li>
+              <li><Link href="/politicaPrivacidad" className="text-gray-900 !no-underline hover:text-blue-600">Política de Privacidad</Link></li>
+              <li><Link href="/terminosCondiciones" className="text-gray-900 !no-underline hover:text-blue-600">Términos y Condiciones</Link></li>
+              <li><Link href="/cambiosDevoluciones" className="text-gray-900 !no-underline hover:text-blue-600">Cambios y Devoluciones</Link></li>
+            </ul>
 
-            {/* CONTACTO */}
-            <div className="flex flex-col gap-3">
-              <h6 className="text-gray-900 tracking-wide uppercase text-sm font-bold mb-0 leading-tight">Contacto</h6>
-              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="home" className="w-4 h-4" /> Valdivia Chile</p>
-              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="envelope" className="w-4 h-4" /> ventas@runajoyas.cl</p>
-              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="phone" className="w-4 h-4" /> +56 9 9876 5432</p>
-              <p className="text-gray-600 text-xs sm:text-sm flex items-start gap-2"><Icon name="clock" className="w-4 h-4" /> Lun–Sáb 10:00–19:00</p>
-            </div>
           </div>
         </div>
       </section>
 
       {/* BENEFICIOS / CONFIANZA */}
-      <section className="w-full mt-8 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center items-start">
-          <div className="flex flex-col items-center justify-start gap-3">
-            <div className="flex items-center justify-center gap-3">
-              <Icon name="truck" className="w-6 h-6 text-gray-700" />
-              <div className="text-left">
-                <p className="text-sm font-bold text-gray-900 m-0">Despacho a todo Chile</p>
-                <p className="text-xs text-gray-600 m-0">Envíos seguros y confiables</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4 mt-2">
-              <Image src="/Correos_Chile_2008.webp" alt="Correos de Chile" width={90} height={24} className="opacity-90" />
-              <Image src="/Starken.png" alt="Starken" width={110} height={32} className="opacity-95" />
-              <Image src="/chilexpress.png.webp" alt="Chilexpress" width={120} height={26} className="opacity-90" />
+      <section className="w-full mt-6 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Icon name="truck" className="w-5 h-5 text-gray-700" />
+            <div>
+              <p className="text-sm font-semibold text-gray-900 m-0">Envíos nacionales</p>
+              <p className="text-xs text-gray-600 m-0">A todo Chile</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <Icon name="lock" className="w-6 h-6 text-gray-700" />
-            <div className="text-left">
-              <p className="text-sm font-bold text-gray-900 m-0">Compra Segura</p>
-              <p className="text-xs text-gray-600 m-0">Pagos cifrados</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-gray-600 text-xs">Pagos con</span>
-                <Image src="/mercadopago.png" alt="Mercado Pago" width={120} height={28} className="opacity-95" />
-              </div>
-            </div>
-          </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <Icon name="credit" className="w-6 h-6 text-gray-700" />
-            <div className="text-left">
-              <p className="text-sm font-bold text-gray-900 m-0">Múltiples métodos de pago</p>
-              <p className="text-xs text-gray-600 m-0">Crédito, débito y transferencias</p>
-              <div className="flex items-center gap-2 mt-2">
-                <Image src="/medios.png" alt="Medios de pago" width={130} height={26} className="opacity-95" />
-              </div>
+            <div className="mt-4">
+                <Image src="/mercadopago.png" alt="Mercado Pago" width={160} height={40} />
+            </div>
+
+          <div className="flex items-center gap-3">
+            <Icon name="lock" className="w-5 h-5 text-gray-700" />
+            <div>
+              <p className="text-sm font-semibold text-gray-900 m-0">Compra segura</p>
+              <p className="text-xs text-gray-600 m-0">Transacciones protegidas</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* COPYRIGHT */}
-      <div className="border-top border-gray-200 mt-8">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
-          {/* Removed the "Página desarrollada por" text per request */}
-          <p className={`${michroma.className} text-gray-800 text-xs tracking-wide select-none text-center md:text-left flex items-center gap-1`}>
+      <div className="border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+          <p className={`${michroma.className} text-gray-700 text-xs tracking-wide select-none`}>
             <span className="text-base">©</span> Desarrollado por NativeCode
           </p>
-          <div className="flex items-center">
 
+          <div className="flex items-center gap-4">
+            <a href="/politicaPrivacidad" className=" !text-gray-600 hover:text-blue-900 text-sm !no-underline">Aviso legal</a>
+            <a href="/politicaPrivacidad" className="!text-gray-600 hover:text-blue-900 text-sm !no-underline">Política de Cookies</a>
           </div>
         </div>
       </div>

@@ -1,10 +1,14 @@
-"use client"
+ "use client"
 
 import {useState, useEffect, Suspense} from 'react';
 import MediaCard from "@/Componentes/MediaCard";
 import Link from "next/link";
 import{useSearchParams} from "next/navigation";
 import { toast } from 'react-hot-toast';
+import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+import { ShoppingCartIcon } from '@heroicons/react/24/solid';
+ import MediaCardImage from "@/Componentes/MediaCardImage";
+ import {BotonFlecha} from "@/Componentes/BotonFlecha";
 
 export default function Catalogo() {
   return (
@@ -259,6 +263,18 @@ function CatalogoInner() {
     }
 
 
+    const [carrito, setCarrito] = useCarritoGlobal();
+
+    function anadirProducto(nuevoProducto) {
+        if(!nuevoProducto) {
+            return toast.error("Debe seleccionar almenos un producto para añadir al carrito");
+        }else{
+            setCarrito((carrito) => [...carrito, nuevoProducto]);
+            return toast.success("Producto añadido al carrito de compras!");
+        }
+    }
+
+
 
     return (
         <>
@@ -369,19 +385,47 @@ function CatalogoInner() {
 
                                     const id = producto.id_producto ?? index;
                        return (
-                           <Link
-                               key={producto.id_producto ?? index}
-                               href={`/producto/${id}`}
-                               className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
-                               style={{ textDecoration: 'none', WebkitTextDecoration: 'none' }}
-                           >
-                               <MediaCard
-                                   titulo={producto.tituloProducto}
-                                   valor={`$ ${producto.valorProducto}`}
-                                   imagenProducto={producto.imagenProducto}
-                                   className="no-underline hover:no-underline"
-                               />
-                           </Link>
+
+                              <div key={producto.id_producto ?? index} className="flex flex-col h-auto">
+                                  <Link
+                                      href={`/producto/${id}`}
+                                      className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
+                                      style={{ textDecoration: 'none', WebkitTextDecoration: 'none' }}
+                                  >
+                                      <MediaCardImage
+                                          imagenProducto={producto.imagenProducto}
+                                          className="no-underline hover:no-underline"
+                                      />
+                                  </Link>
+                                  {/*
+
+                                  <div className="mt-1 flex flex-wrap items-center gap-2 md:flex-row">
+                                      <button
+                                          onClick={() => {anadirProducto(producto)}}
+                                          className="p-2 flex items-center justify-center w-auto h-9 rounded-full bg-sky-200 hover:bg-sky-700 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-300 hover:text-white"
+                                          title="Añadir al carrito"
+                                      >
+                                          Comprar
+                                      </button>
+
+                                      <button            className="p-2 flex items-center justify-center w-auto h-9 rounded-full bg-sky-200 hover:bg-sky-700 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-300 hover:text-white"
+                                      >
+                                          <ShoppingCartIcon className="w-5 h-5" />
+                                      </button>
+                                  </div>*/}
+
+
+
+                                  <label >{producto.tituloProducto}</label>
+                                  <p className="text-gray-500"> ${producto.valorProducto}</p>
+
+
+
+
+                              </div>
+
+
+
                        )
                                 })
                             }

@@ -6,6 +6,9 @@ import BotonWhatsapp from '@/Componentes/BotonWhatsapp'
 import CarritoProvider from "@/ContextosGlobales/CarritoContext";
 import ToasterClient from "@/Componentes/ToasterClient";
 import ObjetoPagarProvider from "@/ContextosGlobales/ObjetoPagarContext";
+import WhatsAppButton from "@/Componentes/FloatingWhatsApp";
+import FloatingWhatsApp from "@/Componentes/FloatingWhatsApp";
+import FlotanteInstagram from "@/Componentes/FlotanteInstagram";
 
 export default function PublicLayout({ children }) {
     return (
@@ -16,7 +19,9 @@ export default function PublicLayout({ children }) {
             <NavBarFemenino />
             <main>{children}</main>
             <Footer id="footer" />
-            <BotonWhatsapp />
+
+          <FloatingWhatsApp/>
+            <FlotanteInstagram/>
         </div>
     </CarritoProvider>
 </ObjetoPagarProvider>

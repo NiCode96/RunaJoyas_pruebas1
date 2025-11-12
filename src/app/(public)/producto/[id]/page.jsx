@@ -154,17 +154,23 @@ useEffect(() => {
                 {/* BENEFICIOS / SELLOS DE CONFIANZA */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                   <div className="rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
-                    <p className="text-sm font-medium text-slate-900">Despacho rápido</p>
-                    <p className="text-xs text-slate-500">A todo Chile</p>
+                    <div className="space-y-1">
+                      <p className="flex items-center text-sm font-semibold text-slate-900">
+                        🔒 <span className="ml-2">Pago seguro</span>
+                      </p>
+                      <p className="flex items-center text-sm font-semibold text-slate-900">
+                        💳 <span className="ml-2">Tarjetas y transferencias</span>
+                      </p>
+
+                    </div>
+
                   </div>
-                  <div className="rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
-                    <p className="text-sm font-medium text-slate-900">Pago seguro</p>
-                    <p className="text-xs text-slate-500">Tarjetas y transferencias</p>
+                  <div className="flex justify-center md:justify-start rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
+
+                      <img src={"/mercadoPago.png"} alt={"mercadoPago"}  className="mr-10  object-contain w-40 h-auto"/>
+
                   </div>
-                  <div className="rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
-                    <p className="text-sm font-medium text-slate-900">Garantía</p>
-                    <p className="text-xs text-slate-500">Cambios y devoluciones</p>
-                  </div>
+
                 </div>
               </>
             )}
