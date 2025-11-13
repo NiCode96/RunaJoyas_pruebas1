@@ -135,7 +135,7 @@ export default function App() {
               <p className="text-xs text-gray-600 m-0">Pagos cifrados</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-gray-600 text-xs">Pagos con</span>
-                <img src="/MP_RGB_HANDSHAKE_color_horizontal.svg" alt="Mercado Pago" className="h-6 w-auto opacity-95" loading="lazy" decoding="async" />
+                <img src="/mercadopago.png" alt="Mercado Pago" className="h-6 w-auto opacity-95" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
