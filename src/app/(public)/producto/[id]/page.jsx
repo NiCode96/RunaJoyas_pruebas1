@@ -152,25 +152,58 @@ useEffect(() => {
 
 
                 {/* BENEFICIOS / SELLOS DE CONFIANZA */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                  <div className="rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
-                    <div className="space-y-1">
-                      <p className="flex items-center text-sm font-semibold text-slate-900">
-                        🔒 <span className="ml-2">Pago seguro</span>
-                      </p>
-                      <p className="flex items-center text-sm font-semibold text-slate-900">
-                        💳 <span className="ml-2">Tarjetas y transferencias</span>
-                      </p>
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-white text-slate-900 px-5 py-4 shadow-sm">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-sky-600 mb-4">
+                    Compra segura con Mercado Pago
+                  </p>
 
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {/* Pago seguro */}
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10 ring-1 ring-sky-500/40 text-lg">
+                        🔒
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold">Pago 100% seguro</p>
+                        <p className="text-xs text-slate-500">
+                          Tus datos viajan cifrados y nunca se comparten con terceros.
+                        </p>
+                      </div>
                     </div>
 
+                    {/* Medios de pago */}
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-400/10 ring-1 ring-sky-400/40 text-lg">
+                        💳
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold">Medios de pago flexibles</p>
+                        <p className="text-xs text-slate-500">
+                          Tarjetas de crédito, débito y transferencias bancarias.
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="/MP_RGB_HANDSHAKE_color_horizontal.svg"
+                            alt="Mercado Pago"
+                            className="h-6 w-auto object-contain"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Soporte */}
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-300/10 ring-1 ring-sky-300/40 text-lg">
+                        🤝
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold">Soporte dedicado</p>
+                        <p className="text-xs text-slate-500">
+                          Acompañamos tu compra ante cualquier duda o problema.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-center md:justify-start rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
-
-                      <img src={"/MERCADOPAGO.png"} alt={"mercadoPago"}  className="mr-10  object-contain w-40 h-auto"/>
-
-                  </div>
-
                 </div>
               </>
             )}
