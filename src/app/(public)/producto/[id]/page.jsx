@@ -167,7 +167,7 @@ useEffect(() => {
                   </div>
                   <div className="flex justify-center md:justify-start rounded-xl border border-slate-200 p-4 bg-white/60 backdrop-blur">
 
-                      <img src={"/mercadoPago.png"} alt={"mercadoPago"}  className="mr-10  object-contain w-40 h-auto"/>
+                      <img src={"/MERCADOPAGO.png"} alt={"mercadoPago"}  className="mr-10  object-contain w-40 h-auto"/>
 
                   </div>
 

@@ -349,7 +349,7 @@ function CatalogoInner() {
                     {/* Sidebar de publicaciones/banners: se mantiene fijo en viewport alto, sin alterar la lógica */}
                     <aside className="hidden md:block order-2 lg:order-1 lg:col-span-1 space-y-4 sticky top-24 self-start">
                         {/* Título del sidebar para dar contexto visual */}
-                        <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendecias</h3>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendencias</h3>
                         <p className="text-sm text-gray-500 mb-4">Lo mejor de la temporada</p>
 
 
@@ -386,7 +386,7 @@ function CatalogoInner() {
                                     const id = producto.id_producto ?? index;
                        return (
 
-                              <div key={producto.id_producto ?? index} className="flex flex-col h-auto">
+                              <div key={producto.id_producto ?? index} className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full">
                                   <Link
                                       href={`/producto/${id}`}
                                       className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
@@ -397,6 +397,7 @@ function CatalogoInner() {
                                           className="no-underline hover:no-underline"
                                       />
                                   </Link>
+
                                   {/*
 
                                   <div className="mt-1 flex flex-wrap items-center gap-2 md:flex-row">
