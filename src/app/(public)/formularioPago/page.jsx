@@ -1,24 +1,47 @@
-// Archivo: front/src/app/page.jsx
-// Este componente es 'use client' porque usa estado y eventos en el navegador
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 
 export default function FormularioPago() {
+
+    /*
+
+LOQUE SE DEBE ENVIAR EN EL BODY
+
+nombre_comprador
+apellidosComprador
+telefono_comprador
+email_Comprador
+identificacion_comprador
+direccion_despacho
+comuna
+regionPais
+comentarios
+totalPagado
+
+    * */
+
     // Estados del formulario y de carga
-    const [carrito, setCarrito] = useCarritoGlobal();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [nombre, setNombre] = useState('');
-    const [apellido, setApellido] = useState('');
-    const [email, setEmail] = useState('');
-    const [telefono, setTelefono] = useState('');
-    const [calle, setCalle] = useState('');
-    const [numero, setNumero] = useState('');
-    const API = process.env.NEXT_PUBLIC_API_URL;
+
+const [nombre_comprador, setnombre_comprador] = useState('');
+const [apellidosComprador, setapellidosComprador] = useState('');
+const [telefono_comprador, settelefono_comprador] = useState('');
+const [email_Comprador, setemail_Comprador] = useState('');
+const [identificacion_comprador, setidentificacion_comprador] = useState('');
+const [direccion_despacho, setdireccion_despacho] = useState('');
+const [comuna, setComuna] = useState('');
+const [regionPais, setRegionPais] = useState('');
+const [comentarios, setComentarios] = useState('');
+const [totalPagado, settotalPagado] = useState(0);
+
+const [carrito] = useCarritoGlobal();
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState('');
+
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 
     const productoCatidades = {};
@@ -33,17 +56,22 @@ export default function FormularioPago() {
 
 
 
-    const productosDelCarrito = Object.values(productoCatidades)
+    const productosDelCarrito = Object.values(productoCatidades);
     const productosFiltrados = productosDelCarrito.map((p) => ({
-        nombre: p.nombre ?? p.nombreProducto ?? p.titulo ?? "Producto",
-        precio: Number(p.precio ?? p.valorProducto ?? p.unit_price ?? 0),
-        cantidad: Number(p.cantidadVendida ?? p.cantidad ?? p.quantity ?? 1),
-    }));
+         nombre: p.nombre ?? p.nombreProducto ?? p.titulo ?? "Producto",
+         precio: Number(p.precio ?? p.valorProducto ?? p.unit_price ?? 0),
+         cantidad: Number(p.cantidadVendida ?? p.cantidad ?? p.quantity ?? 1),
+     }));
 
-    const totalCarrito = productosFiltrados.reduce(
-        (acc, p) => acc + (Number(p.precio) * Number(p.cantidad)),
-        0
-    );
+    const totalCarrito = useMemo(() => {
+        return productosFiltrados.reduce((acc, p) => acc + (Number(p.precio) * Number(p.cantidad)), 0);
+    }, [productosFiltrados]);
+
+    // Evitar setState durante el render -> actualizar totalPagado solo cuando cambie totalCarrito
+    useEffect(() => {
+        settotalPagado(totalCarrito);
+    }, [totalCarrito]);
+
     const formatCLP = (n) => Number(n).toLocaleString('es-CL');
 
 
@@ -66,19 +94,18 @@ export default function FormularioPago() {
                 // Enviamos el payload tal cual lo espera el backend (title, unit_price, quantity)
                 body: JSON.stringify({
                     productosDelCarrito: productosFiltrados,
-                    usuario: {
-                        id: 10,
-                        nombre,
-                        apellido,
-                        email,
-                        phone: { number: Number(telefono) },
-                        address: {
-                            street_name: calle,
-                            street_number: Number(numero)
-                        }
+                    comprador: {
+                        nombre_comprador,
+                        apellidosComprador,
+                        telefono_comprador,
+                        email_Comprador,
+                        identificacion_comprador,
+                        direccion_despacho,
+                        comuna,
+                        regionPais,
+                        comentarios,
+                        totalPagado,
                     },
-                    idPedido: 555,
-                    idUsuario: 10,
                     notification_url: "https://eric-tepid-claretha.ngrok-free.dev/pagosMercadoPago/notificacionPago"
                 }),
             });
@@ -92,7 +119,7 @@ export default function FormularioPago() {
             // El backend devuelve init_point / sandbox_init_point
             // Usamos sandbox_init_point si está disponible para pruebas
 
-            const checkoutUrl = data.init_point;
+            const checkoutUrl = data.sandbox_init_point;
             if (!checkoutUrl) {
                 return toast.error("No se puede procesar el pago porfavor evalue otro medio de pago contactandonos por WhatsApp")
             }
@@ -131,8 +158,8 @@ export default function FormularioPago() {
                       <span className="text-sm font-medium text-gray-700">Nombre</span>
                       <input
                         type="text"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
+                        value={nombre_comprador}
+                        onChange={(e) => setnombre_comprador(e.target.value)}
                         required
                         className="p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
                         placeholder="Ej.: María"
@@ -143,61 +170,113 @@ export default function FormularioPago() {
                       <span className="text-sm font-medium text-gray-700">Apellido</span>
                       <input
                         type="text"
-                        value={apellido}
-                        onChange={(e) => setApellido(e.target.value)}
+                        value={apellidosComprador}
+                        onChange={(e) => setapellidosComprador(e.target.value)}
                         required
                         className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
                         placeholder="Ej.: López"
                       />
                     </label>
 
-                    <label className="block md:col-span-2">
-                      <span className="text-sm font-medium text-gray-700">Email</span>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                        placeholder="ejemplo@correo.com"
-                      />
-                    </label>
 
-                    <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Teléfono</span>
-                      <input
-                        type="number"
-                        value={telefono}
-                        onChange={(e) => setTelefono(e.target.value)}
-                        required
-                        className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                        placeholder="Ej.: 912345678"
-                      />
-                    </label>
+
 
                     <label className="block md:col-span-2">
-                      <span className="text-sm font-medium text-gray-700">Calle</span>
+                      <span className="text-sm font-medium text-gray-700">Telefono</span>
                       <input
                         type="text"
-                        value={calle}
-                        onChange={(e) => setCalle(e.target.value)}
+                        value={telefono_comprador}
+                        onChange={(e) => settelefono_comprador(e.target.value)}
                         required
                         className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                        placeholder="Ej.: Av. Siempre Viva"
+                        placeholder="+56 912345678"
+                      />
+                    </label>
+
+
+
+                    <label className="block">
+                      <span className="text-sm font-medium text-gray-700">Email</span>
+                      <input
+                        type="text"
+                        value={email_Comprador}
+                        onChange={(e) => setemail_Comprador(e.target.value)}
+                        required
+                        className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
+                        placeholder="Ej.: tucorreo@gmail.com"
+                      />
+                    </label>
+
+
+
+                    <label className="block md:col-span-2">
+                      <span className="text-sm font-medium text-gray-700"> RUT/DNI</span>
+                      <input
+                        type="text"
+                        value={identificacion_comprador}
+                        onChange={(e) => setidentificacion_comprador(e.target.value)}
+                        required
+                        className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
+                        placeholder="Ej.: 11.111.111-1"
                       />
                     </label>
 
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Número</span>
+                      <span className="text-sm font-medium text-gray-700">Direccion Despacho</span>
                       <input
-                        type="number"
-                        value={numero}
-                        onChange={(e) => setNumero(e.target.value)}
+                        type="text"
+                        value={direccion_despacho}
+                        onChange={(e) => setdireccion_despacho(e.target.value)}
                         required
                         className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                        placeholder="Ej.: 742"
+                        placeholder="Ej: Alameda 123"
                       />
                     </label>
+
+
+
+                      <label className="block">
+                          <span className="text-sm font-medium text-gray-700">Comuna</span>
+                          <input
+                              type="text"
+                              value={comuna}
+                              onChange={(e) => setComuna(e.target.value)}
+                              required
+                              className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
+                              placeholder="Ej: San Carlos"
+                          />
+                      </label>
+
+
+
+
+                      <label className="block">
+                          <span className="text-sm font-medium text-gray-700"> Region / Pais </span>
+                          <input
+                              type="text"
+                              value={regionPais}
+                              onChange={(e) => setRegionPais(e.target.value)}
+                              required
+                              className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
+                              placeholder="Ej: Los Rios / Chile"
+                          />
+                      </label>
+
+
+
+                      <label className="block">
+                          <span className="text-sm font-medium text-gray-700"> Comentarios </span>
+                          <textarea
+                              value={comentarios}
+                              onChange={(e) => setComentarios(e.target.value)}
+                              required
+                              className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
+                              placeholder="Ej: Necesito que mi paquete llegue a cierta hora.."
+                          />
+                      </label>
+
+
+
                   </div>
 
                   {error && (
@@ -212,7 +291,7 @@ export default function FormularioPago() {
                       disabled={loading}
                       className="inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {loading ? 'Redirigiendo…' : 'Pagar con Mercado Pago'}
+                      {loading ? 'Redirigiendo…' : 'Continuar con Pago'}
                     </button>
 
                     <span className="text-xs text-gray-500 hidden sm:inline">

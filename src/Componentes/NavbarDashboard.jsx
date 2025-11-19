@@ -54,15 +54,52 @@ export default function NavbarDashboard() {
 
           {/* Navegación Desktop */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+
+              <Button
+                  component={Link}
+                  href="/dashboard/pedidosCompras"
+                  color="inherit"
+                  disableRipple
+                  sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
+              >
+                  Pedidos
+              </Button>
+
+
+
             <Button
               component={Link}
-              href="/dashboard/categoriasProductos"
+
+              href="/dashboard/ingresoProductos"
               color="inherit"
               disableRipple
               sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
             >
-              Categorías
+              Productos
             </Button>
+
+            <Button
+              component={Link}
+              href="/dashboard/gestionStock"
+              color="inherit"
+              disableRipple
+              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
+            >
+              Inventario
+            </Button>
+
+
+
+
+              <Button
+                  component={Link}
+                  href="/dashboard/categoriasProductos"
+                  color="inherit"
+                  disableRipple
+                  sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
+              >
+                  Categorias
+              </Button>
 
             <Button
               component={Link}
@@ -72,29 +109,6 @@ export default function NavbarDashboard() {
               sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
             >
               Publicaciones
-            </Button>
-
-
-
-
-              <Button
-                  component={Link}
-                  href="/dashboard/gestionStock"
-                  color="inherit"
-                  disableRipple
-                  sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
-              >
-                  Inventario
-              </Button>
-
-            <Button
-              component={Link}
-              href="/dashboard/ingresoProductos"
-              color="inherit"
-              disableRipple
-              sx={{ fontFamily: 'Michroma, sans-serif', textTransform: 'none', fontWeight: 600, borderRadius: '12px', px: 2.5, color: '#0A2540', border: '1px solid transparent', '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' } }}
-            >
-              Productos
             </Button>
 
 
@@ -141,6 +155,12 @@ export default function NavbarDashboard() {
                   Edición Web
                 </Link>
               </MenuItem>
+
+                <MenuItem onClick={handleCloseNavMenu}>
+                    <Link href="/dashboard/gestionStock" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                        Inventario
+                    </Link>
+                </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

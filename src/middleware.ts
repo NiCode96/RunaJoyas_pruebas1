@@ -1,6 +1,6 @@
 
 
-/*
+
 // frontend/src/middleware.ts
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -15,8 +15,8 @@ export const config = {
 }
 
 
+/*
 
-* */
 
 // TypeScript
 // archivo: `frontend/src/middleware.ts`
@@ -94,3 +94,4 @@ export const config = {
         '/dashboard/:path*'
     ],
 }
+* */
