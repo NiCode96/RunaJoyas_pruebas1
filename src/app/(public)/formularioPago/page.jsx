@@ -25,7 +25,6 @@ totalPagado
     * */
 
     // Estados del formulario y de carga
-
 const [nombre_comprador, setnombre_comprador] = useState('');
 const [apellidosComprador, setapellidosComprador] = useState('');
 const [telefono_comprador, settelefono_comprador] = useState('');

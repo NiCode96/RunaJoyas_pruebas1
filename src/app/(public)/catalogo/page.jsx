@@ -35,7 +35,6 @@ function CatalogoInner() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
-
     useEffect(() => {
         if(buscarRecientes){
             listarRecientes();
@@ -55,7 +54,7 @@ function CatalogoInner() {
     }, [id_CategoriaNavBar]) ;
 
 
-    function agregarAlCarrito2(productoSeleccionado) {
+    function agregarAlCarrito(productoSeleccionado) {
         setCarrito(arrayProductosPrevios => [...arrayProductosPrevios, productoSeleccionado])
         toast.success("Producto Seleccionado!")
     }
@@ -65,7 +64,7 @@ function CatalogoInner() {
             if (!productoSeleccionado) {
                 return toast.error("Debe haber seleccionado el producto para poder realziar la compra inmediata");
             }else{
-                agregarAlCarrito2(productoSeleccionado);
+                agregarAlCarrito(productoSeleccionado);
                 router.push("/carrito");
 
             }
@@ -281,14 +280,8 @@ function CatalogoInner() {
             console.log(err);
         }
     }
-    function anadirProducto(nuevoProducto) {
-        if(!nuevoProducto) {
-            return toast.error("Debe seleccionar almenos un producto para añadir al carrito");
-        }else{
-            setCarrito((carrito) => [...carrito, nuevoProducto]);
-            return toast.success("Producto añadido al carrito de compras!");
-        }
-    }
+
+
 
 
 
@@ -447,7 +440,7 @@ function CatalogoInner() {
                                        </button>
 
                                        <button
-                                           onClick={() => {anadirProducto(producto)}}
+                                           onClick={() => {agregarAlCarrito(producto)}}
                                            className="  p-2 flex items-center justify-center w-auto h-9  bg-sky-50 hover:bg-sky-800 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2  hover:text-white"
                                            title="Añadir al carrito"
                                        >
