@@ -121,7 +121,7 @@ const API = process.env.NEXT_PUBLIC_API_URL;
             // El backend devuelve init_point / sandbox_init_point
             // Usamos sandbox_init_point si está disponible para pruebas
 
-            const checkoutUrl = data.sandbox_init_point;
+            const checkoutUrl = data.init_point;
             if (!checkoutUrl) {
                 return toast.error("No se puede procesar el pago porfavor evalue otro medio de pago contactandonos por WhatsApp")
             }

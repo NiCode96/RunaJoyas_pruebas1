@@ -169,6 +169,8 @@ export default function GestionStock() {
                 className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition"
               >
 
+                  <img src={producto.imagenProducto} alt="Producto" className="rounded-2xl h-25 w-25 hidden md:block" />
+
 
                   <div className="flex flex-col">
                   <span className="text-[11px] uppercase tracking-wider text-slate-500">Producto</span>
@@ -176,8 +178,6 @@ export default function GestionStock() {
                     {producto.tituloProducto}
                   </span>
                 </div>
-
-                  <img src={producto.imagenProducto} alt="Producto" className="rounded-2xl h-25 w-25 hidden md:block" />
 
                 <div className="flex items-center gap-6">
                   <span className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">

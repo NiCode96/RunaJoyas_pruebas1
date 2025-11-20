@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Carousel from 'react-bootstrap/Carousel';
 
-function ControlledCarousel({ imagen1, imagen2, imagen3 }) {
+function ControlledCarousel({ imagen1, imagen2, imagen3, imagen4 }) {
   const [index, setIndex] = useState(0);
 
   const handleSelect = (selectedIndex) => {
@@ -11,7 +11,7 @@ function ControlledCarousel({ imagen1, imagen2, imagen3 }) {
   };
 
   // Filtramos imágenes no válidas (undefined, null, "")
-  const images = [imagen1, imagen2, imagen3].filter(src => typeof src === 'string' && src.trim() !== '');
+  const images = [imagen1, imagen2, imagen3, imagen4].filter(src => typeof src === 'string' && src.trim() !== '');
 
   return (
     <div className="w-full h-full max-h-[600px] overflow-hidden rounded-xl">

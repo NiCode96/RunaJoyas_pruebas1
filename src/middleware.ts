@@ -1,5 +1,5 @@
 
-
+/*
 
 // frontend/src/middleware.ts
 import { NextResponse, type NextRequest } from 'next/server'
@@ -14,8 +14,8 @@ export const config = {
     matcher: ['/dashboard/:path*'], // o simplemente [] si quieres que no aplique a ninguna
 }
 
+* */
 
-/*
 
 
 // TypeScript
@@ -29,7 +29,7 @@ const isProtectedRoute = createRouteMatcher(['/dashboard/:path*'])
 
 const ALLOWED_EMAILS = new Set([
     'mariafernandadelmauro@gmail.com',
-    'nicolas.machucadev@gmail.com',
+    'soporte@nativecode.com',
 ])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
@@ -94,4 +94,3 @@ export const config = {
         '/dashboard/:path*'
     ],
 }
-* */

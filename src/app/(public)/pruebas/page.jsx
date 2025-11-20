@@ -1,39 +1,31 @@
 "use client"
 
 import {useState, useEffect, Suspense} from 'react';
+import MediaCard from "@/Componentes/MediaCard";
 import Link from "next/link";
 import{useSearchParams} from "next/navigation";
 import { toast } from 'react-hot-toast';
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import MediaCardImage from "@/Componentes/MediaCardImage";
+import {BotonFlecha} from "@/Componentes/BotonFlecha";
 import { motion } from "motion/react";
-import {useRouter} from "next/navigation";
-
+import ShadcnCardMedia from "@/Componentes/ShadcnCardMedia";
 
 export default function Catalogo() {
-  return (
-    <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
-      <CatalogoInner />
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
+            <CatalogoInner />
+        </Suspense>
+    );
 }
 
-
 function CatalogoInner() {
-
 
     const buscar = useSearchParams();
     const id_CategoriaNavBar = buscar.get("categoria");
     const buscarOfertas = buscar.get("ofertas");
     const buscarRecientes = buscar.get("recientes");
-    const[listaProductos, setListaProductos] = useState([]);
-    const[publicaciones, setPublicaciones] = useState([]);
-    const [listaCategorias, setListaCategorias] = useState([]);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
-    const router = useRouter();
-    const API = process.env.NEXT_PUBLIC_API_URL;
-    const [carrito, setCarrito] = useCarritoGlobal();
 
 
     useEffect(() => {
@@ -54,33 +46,13 @@ function CatalogoInner() {
         }
     }, [id_CategoriaNavBar]) ;
 
-
-    function agregarAlCarrito2(productoSeleccionado) {
-        setCarrito(arrayProductosPrevios => [...arrayProductosPrevios, productoSeleccionado])
-        toast.success("Producto Seleccionado!")
-    }
-
-    function comparAhora(productoSeleccionado) {
-        try {
-            if (!productoSeleccionado) {
-                return toast.error("Debe haber seleccionado el producto para poder realziar la compra inmediata");
-            }else{
-                agregarAlCarrito2(productoSeleccionado);
-                router.push("/carrito");
-
-            }
-
-        }catch(err) {
-            console.log(err)
-            return toast.error("No se puede comprar este Articulo por problemas tecnicos. Contacte al vendedor para concretar la venta.")
-        }
-
-    }
+    const[listaProductos, setListaProductos] = useState([]);
+    const[publicaciones, setPublicaciones] = useState([]);
+    const [listaCategorias, setListaCategorias] = useState([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
 
 
-
-
-
+    const API = process.env.NEXT_PUBLIC_API_URL;
 
     //FUNCION PARA LISTAR TODOS LOS PRODUCTOS RECIENTES QUE NO TENGAN ELIMINACION LOGICA
     async function listarRecientes(){
@@ -109,29 +81,34 @@ function CatalogoInner() {
     }
 
 
+
+
     //FUNCION PARA FILTRAR PRODUCTOS SEGUN CATEGORIA
     async function filtrarPorCategoria(categoriaProducto){
-   try {
-       if(!categoriaProducto){
-           return;
-       }
-       const res = await fetch(`${API}/producto/categoriaProducto`, {
-           method: "POST",
-           headers: {Accept: "application/json",
-           "Content-Type": "application/json"},
-           mode: "cors",
-           body: JSON.stringify({categoriaProducto})
-       })
-       if (!res.ok){
-          toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
-          return;
-       }
-       const dataFiltrada = await res.json();
-       setListaProductos(dataFiltrada);
-   }catch (error) {
-       console.log(error);
-   }
+        try {
+            if(!categoriaProducto){
+                return;
+            }
+            const res = await fetch(`${API}/producto/categoriaProducto`, {
+                method: "POST",
+                headers: {Accept: "application/json",
+                    "Content-Type": "application/json"},
+                mode: "cors",
+                body: JSON.stringify({categoriaProducto})
+            })
+            if (!res.ok){
+                toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
+                return;
+            }
+            const dataFiltrada = await res.json();
+            setListaProductos(dataFiltrada);
+        }catch (error) {
+            console.log(error);
+        }
     }
+
+
+
 
 
     // FUNCION PARA SELECCIONAR LA LISTA COMPLETA DE CATEGORIAS DE PRODUCTOS
@@ -155,6 +132,7 @@ function CatalogoInner() {
             console.error(error);
         }
     }
+
     useEffect(() => {
         seleccionarCategoriasCatalogo();
     }, []);
@@ -214,6 +192,7 @@ function CatalogoInner() {
             console.log(err);
         }
     }
+
     useEffect(() => {
         if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
             listarProductos();
@@ -242,6 +221,8 @@ function CatalogoInner() {
             console.error("Problema al consultar Backen desde la vista fronend:"+err);
         }
     }
+
+
     useEffect(() => {
         publicacionesLaterales();
     }, []);
@@ -256,7 +237,7 @@ function CatalogoInner() {
 
             if(!res.ok) {
                 return toast.error("Ha habido un problema con el filtro de precios; contacte soporte TI de NativeCode.")
-             } else {
+            } else {
                 const dataProductosMayorPrecio = await res.json();
                 setListaProductos(dataProductosMayorPrecio);
             }
@@ -264,6 +245,7 @@ function CatalogoInner() {
             console.log(err);
         }
     }
+
     async function ordenarMenorPrecio(){
         try {
             const res = await fetch(`${API}/producto/ordenarMenor`, {
@@ -273,7 +255,7 @@ function CatalogoInner() {
             })
             if(!res.ok) {
                 return toast.error("Ha habido un problema con el filtro de precios; contacte soporte TI de NativeCode.");
-             } else{
+            } else{
                 const dataProductosMenorPrecio = await res.json();
                 setListaProductos(dataProductosMenorPrecio);
             }
@@ -281,6 +263,10 @@ function CatalogoInner() {
             console.log(err);
         }
     }
+
+
+    const [carrito, setCarrito] = useCarritoGlobal();
+
     function anadirProducto(nuevoProducto) {
         if(!nuevoProducto) {
             return toast.error("Debe seleccionar almenos un producto para añadir al carrito");
@@ -289,13 +275,6 @@ function CatalogoInner() {
             return toast.success("Producto añadido al carrito de compras!");
         }
     }
-
-
-
-
-
-
-
 
 
 
@@ -316,35 +295,35 @@ function CatalogoInner() {
 
                     {/* Barra de acciones (visual/mocks): etiquetas, orden y utilidades sin alterar lógica */}
                     <div className="mt-6 flex flex-wrap items-center gap-3">
-                      <div className="flex w-full lg:w-auto">
-                        {/* ACCESIBILIDAD: ETIQUETA OCULTA PARA LECTOR DE PANTALLA */}
-                        <span className="sr-only">Filtrar por categoría</span>
-                        {/* CINTA DE CATEGORÍAS (RESPONSIVA): SCROLL HORIZONTAL EN MÓVIL */}
+                        <div className="flex w-full lg:w-auto">
+                            {/* ACCESIBILIDAD: ETIQUETA OCULTA PARA LECTOR DE PANTALLA */}
+                            <span className="sr-only">Filtrar por categoría</span>
+                            {/* CINTA DE CATEGORÍAS (RESPONSIVA): SCROLL HORIZONTAL EN MÓVIL */}
 
 
-                        <div className="flex gap-2 overflow-x-auto py-2 pr-2">
+                            <div className="flex gap-2 overflow-x-auto py-2 pr-2">
 
-                            <button
-                                key={"key"}
-                                type="button"
-                                onClick={() => listarProductos()}
-                                className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
-                            >
-                                Ver Todos
-                            </button>
+                                <button
+                                    key={"key"}
+                                    type="button"
+                                    onClick={() => listarProductos()}
+                                    className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                                >
+                                    Ver Todos
+                                </button>
 
-                          {listaCategorias.map((categoria) => (
-                            <button
-                              key={categoria.id_categoriaProducto}
-                              type="button"
-                              onClick={() => filtrarPorCategoria(categoria.id_categoriaProducto)}
-                              className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
-                            >
-                              {categoria.descripcionCategoria}
-                            </button>
-                          ))}
+                                {listaCategorias.map((categoria) => (
+                                    <button
+                                        key={categoria.id_categoriaProducto}
+                                        type="button"
+                                        onClick={() => filtrarPorCategoria(categoria.id_categoriaProducto)}
+                                        className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                                    >
+                                        {categoria.descripcionCategoria}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                      </div>
 
 
 
@@ -381,14 +360,14 @@ function CatalogoInner() {
                         {publicaciones
                             .filter(publicacion => Number(publicacion.id_publicaciones) !== 10)
                             .map(publicacion => (
-                            <div key={publicacion.id_publicaciones} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition">
-                                <img
-                                    src={publicacion.imagenPublicaciones_primera}
-                                    className="w-full aspect-[3/4] object-cover"
-                                    alt="Publicación"
-                                />
-                            </div>
-                        ))}
+                                <div key={publicacion.id_publicaciones} className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition">
+                                    <img
+                                        src={publicacion.imagenPublicaciones_primera}
+                                        className="w-full aspect-[3/4] object-cover"
+                                        alt="Publicación"
+                                    />
+                                </div>
+                            ))}
 
 
 
@@ -407,65 +386,37 @@ function CatalogoInner() {
                                 listaProductos.map((producto, index) => {
 
                                     const id = producto.id_producto ?? index;
-                       return (
+                                    return (
 
 
 
 
-                           <motion.div
-                               key={id}
-                               layout                      // 🔹 anima cambios de posición/tamaño
-                               layoutId={`producto-${id}`} // 🔹 útil si luego quieres "shared layout" con la página de detalle
-                               transition={{ layout: { duration: 0.35, ease: "easeOut" } }}
-                               initial={{ opacity: 0, y: 10 }}
-                               animate={{ opacity: 1, y: 0 }}
-                               whileHover={{ scale: 1.03 }}
-                               className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full"
-                           >
+                                        <motion.div
+                                            key={id}
+                                            layout                      // 🔹 anima cambios de posición/tamaño
+                                            layoutId={`producto-${id}`} // 🔹 útil si luego quieres "shared layout" con la página de detalle
+                                            transition={{ layout: { duration: 0.35, ease: "easeOut" } }}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            whileHover={{ scale: 1.03 }}
+                                            className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full"
+                                        >
 
-
-                               <div className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full">
-                                   <Link
-                                       href={`/producto/${id}`}
-                                       className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
-                                       style={{ textDecoration: 'none', WebkitTextDecoration: 'none' }}
-                                   >
-                                       <MediaCardImage
-                                           imagenProducto={producto.imagenProducto}
-                                           className="no-underline hover:no-underline"
-                                       />
-                                   </Link>
-
-
-                                   <div className="mt-1 flex justify-center gap-2   hover:blo">
-                                       <button
-                                           onClick={() => {comparAhora(producto)}}
-                                           className="  p-2 flex items-center justify-center w-auto h-9  bg-sky-50 hover:bg-sky-800 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2  hover:text-white"
-                                           title="Comprar Ahora"
-                                       >
-                                           Comprar
-                                       </button>
-
-                                       <button
-                                           onClick={() => {anadirProducto(producto)}}
-                                           className="  p-2 flex items-center justify-center w-auto h-9  bg-sky-50 hover:bg-sky-800 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2  hover:text-white"
-                                           title="Añadir al carrito"
-                                       >
-                                           <ShoppingCartIcon className="w-5 h-5"></ShoppingCartIcon>
-                                       </button>
-
-                                   </div>
-
-
-                                   <label >{producto.tituloProducto}</label>
-                                   <p className="text-gray-500"> ${producto.valorProducto}</p>
-                               </div>
-
-                           </motion.div>
+                                            <ShadcnCardMedia
+                                                titulo={producto.tituloProducto}
+                                                imagen={producto.imagenProducto}
+                                                precio={producto.valorProducto}
+                                            />
 
 
 
-                       )
+
+
+                                        </motion.div>
+
+
+
+                                    )
                                 })
                             }
                         </div>

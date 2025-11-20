@@ -5,6 +5,7 @@ import Carrusel from "@/Componentes/Carrusel";
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 import {toast} from "react-hot-toast";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 
 export default function ProductoDetalle() {
@@ -12,20 +13,33 @@ export default function ProductoDetalle() {
 
     //USO DE CARRITO GLOBAL DE CONTEXT PARA EL USO EN TODA LA APLICACION DE ARRAY DE OBJETOS GLOBALES
     const [carrito, setCarrito] = useCarritoGlobal();
+    const router = useRouter();
 
     function agregarAlCarrito(productoSeleccionado) {
        setCarrito(arrayProductosPrevios => [...arrayProductosPrevios, productoSeleccionado])
         toast.success("Producto añadido al carrito de compras!")
     }
 
+    function comparAhora(productoSeleccionado) {
+        try {
+            if (!productoSeleccionado) {
+                return toast.error("Debe haber seleccionado el producto para poder realziar la compra inmediata");
+            }else{
+                agregarAlCarrito(productoSeleccionado);
+                router.push("/carrito");
+
+            }
+
+        }catch(err) {
+            console.log(err)
+            return toast.error("No se puede comprar este Articulo por problemas tecnicos. Contacte al vendedor para concretar la venta.")
+        }
+
+    }
+
 
     //USE STATE PARA ALMACENAR EL OBJETO SELECCIONADO CON USESTATE
     const [producto, setProducto] = useState({});
-
-    // UI: cantidad seleccionada para el carrito (solo estado local de interfaz)
-    const [cantidad, setCantidad] = useState(1);
-    const incrementar = () => setCantidad((prev) => Math.min(prev + 1, 99));
-    const decrementar = () => setCantidad((prev) => Math.max(prev - 1, 1));
 
     //SE USA EL PARAM DE USEPARAMS NAVEGATE DE NBEXT PARA SUAR EL ID
     const params = useParams();
@@ -78,6 +92,7 @@ useEffect(() => {
     imagen1={producto.imagenProducto}
     imagen2={producto.imagenProductoSegunda ?? producto.imagenProducto}
     imagen3={producto.imagenProductoTercera ?? producto.imagenProducto}
+    imagen4={producto.imagenProductoCuarta ?? producto.imagenProducto}
 ></Carrusel>
             )}
           </div>
@@ -133,20 +148,18 @@ useEffect(() => {
                     Añadir Unidad al carrito
                   </button>
 
-                    <Link href="/carrito">
+
                         <button
+                            onClick={() => comparAhora(producto)}
 
                             type="button"
                             className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-950 active:bg-black shadow-lg shadow-slate-900/20 ring-1 ring-black/10 transition"
                         >
-                            Ir al carrito
+                            Comprar
                         </button>
-                    </Link>
+
 
                 </div>
-
-
-
 
 
 
