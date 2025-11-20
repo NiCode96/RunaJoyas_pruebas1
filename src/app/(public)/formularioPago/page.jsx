@@ -58,6 +58,8 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 
     const productosDelCarrito = Object.values(productoCatidades);
     const productosFiltrados = productosDelCarrito.map((p) => ({
+         id_producto: p.id_producto ?? p.id ?? p.producto_id ?? p.idProducto ?? null,
+         tituloProducto: p.tituloProducto ?? p.titulo ?? p.nombre ?? p.nombreProducto ?? "Producto",
          nombre: p.nombre ?? p.nombreProducto ?? p.titulo ?? "Producto",
          precio: Number(p.precio ?? p.valorProducto ?? p.unit_price ?? 0),
          cantidad: Number(p.cantidadVendida ?? p.cantidad ?? p.quantity ?? 1),

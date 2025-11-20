@@ -5,8 +5,11 @@ import {toast} from "react-hot-toast";
 import {useEffect, useState} from "react";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {ShadcnSelect} from "@/Componentes/shadcnSelect";
+import {ShadcnTable} from "@/Componentes/shadcnTable";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js"
 import Link from "next/link";
+import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
+
 
 export default function PedidoDetalle(){
     const searchParams = new useSearchParams();
@@ -94,26 +97,67 @@ async function cambiarEstado(id_pedido, nuevoestado){
 
 
 
+   const [listaDetallada, setListaDetallada] = useState([]);
+
+    async function obtenerListaDetallada(id_pedido){
+        try {
+            if(!id_pedido){
+               return toast.error("Ha ocurrido un error en cargar el ID del pedido porfavor  contacte a soporte de NativeCode");
+            }else{
+
+                const res = await fetch(`${API}/pedidos/seleccionarDetalle`, {
+                    method: "POST",
+                    headers: {Accept: "application/json",
+                    "Content-Type": "application/json",},
+                    mode: "cors",
+                    body: JSON.stringify({id_pedido}),
+                })
+                if(!res.ok){
+                    return toast.error("problema en servidor porfavor contacte a soporte de NativeCode");
+                }else{
+                    const dataPedidoDetalle = await res.json();
+                    setListaDetallada(dataPedidoDetalle);
+                }
+            }
+        }catch (error) {
+            console.log(error);
+            return toast.error('Ha ocurrido un problema porfavor contacte a soporte de NativeCode'  + error.message);
+        }
+    }
+
+    useEffect(() => {
+        obtenerListaDetallada(id_pedido)
+    }, [])
+
+    const pedidoDetalle = listaDetallada || [{id_producto: 0, tituloProducto: "SIN DATO", cantidad: 0, precio_unitario: 0}]
+
+    let totalCompra =0;
+
+    pedidoDetalle.map(pedido => {
+        totalCompra += (pedido.precio_unitario * pedido.cantidad);
+    })
 
 
 
     return (
-    <div className="p-6 sm:p-10 bg-white min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-white to-sky-50 px-4 py-6 sm:px-10 sm:py-10">
         <ToasterClient />
 
-        <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-semibold text-sky-700">Detalle del Pedido</h1>
-<Link href={"/dashboard/pedidosCompras"}  >
-    <ShadcnButton nombre={"Volver a Listado"} />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-sky-100 pb-6">
+            <div className="space-y-1">
+                <h1 className="text-2xl sm:text-3xl font-semibold text-sky-800 tracking-tight">
+                    Detalle del pedido
+                </h1>
+                <p className="text-sm text-slate-500">
+                    Revisa la información del cliente y el estado del pedido desde un solo lugar.
+                </p>
+            </div>
+            <Link href={"/dashboard/pedidosCompras"}>
+                <ShadcnButton nombre={"Volver a Listado"} />
+            </Link>
+        </div>
 
-</Link>      </div>
-
-        <div className="
-    flex flex-col sm:flex-row
-    items-stretch sm:items-center
-    gap-4 sm:gap-6
-    mt-5
-">
+        <div className="mt-6 rounded-xl border border-sky-100 bg-white/70 p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 shadow-sm">
             <ShadcnSelect
                 nombreDefault={"Estados de Pedidos"}
                 value1={"Pendiente"}
@@ -140,24 +184,26 @@ async function cambiarEstado(id_pedido, nuevoestado){
         */}
 
         {detalleComprador.map(comprador => (
-            <div key={comprador.id_pedido} className="space-y-3 mt-10">
-                <h3 className="text-sky-800 font-medium"><span className="text-sky-800 font-semibold">Estado Actual :   </span>
+            <div key={comprador.id_pedido} className="mt-8">
+                <h3 className="text-sm font-medium text-slate-500 mb-2">
+                    Estado actual
+                </h3>
+                <div className="inline-flex items-center rounded-full border border-sky-100 bg-sky-50 px-4 py-1.5 text-sm font-semibold text-sky-800">
                     {(
                         {
                             1: "Pendiente",
                             2: "Confirmado",
                             3: "Completado",
-                            4: "Anulado"})[comprador.estado_pedido] ?? "Pago Pendiente"}
-
-                </h3>
+                            4: "Anulado"
+                        }
+                    )[comprador.estado_pedido] ?? "Pago Pendiente"}
+                </div>
             </div>
-
-
         ))}
 
 
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 bg-sky-50 border border-sky-100 rounded-xl p-8 shadow-sm">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/80 border border-sky-100 rounded-xl p-6 sm:p-8 shadow-sm">
 
             {detalleComprador.map(comprador => (
                 <div key={comprador.id_pedido} className="space-y-3">
@@ -180,5 +226,55 @@ async function cambiarEstado(id_pedido, nuevoestado){
             ))}
 
         </div>
+
+
+        <div className="mt-10 space-y-3">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-lg sm:text-xl font-semibold text-sky-800">
+                        Productos del pedido
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                        Revisa los productos incluidos, cantidades y valor unitario.
+                    </p>
+                </div>
+                <span className="hidden sm:inline-flex items-center rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-800">
+                    {pedidoDetalle.length} productos
+                </span>
+            </div>
+
+            <div className="bg-white border border-sky-100 rounded-xl shadow-sm overflow-x-auto">
+                <div className="min-w-full">
+                    <Table>
+                        <TableCaption>Tabla Detalle pedidos.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px] px-4 py-3">Codigo Producto</TableHead>
+                                <TableHead className="px-4 py-3">Nombre Producto</TableHead>
+                                <TableHead className="px-4 py-3">Cantidad Solicitada</TableHead>
+                                <TableHead className="text-right px-4 py-3">Valor unidad</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {pedidoDetalle.map((pedido) => (
+                                <TableRow key={pedido.id_producto}>
+                                    <TableCell className="font-medium px-4 py-3">{pedido.id_producto}</TableCell>
+                                    <TableCell className="px-4 py-3">{pedido.tituloProducto}</TableCell>
+                                    <TableCell className="px-4 py-3">{pedido.cantidad}</TableCell>
+                                    <TableCell className="text-right px-4 py-3">{pedido.precio_unitario}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={3} className="px-4 py-3">Total Compra</TableCell>
+                                <TableCell className="text-right px-4 py-3">{totalCompra}</TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </div>
+            </div>
+        </div>
     </div>
-); }
+    );
+}
