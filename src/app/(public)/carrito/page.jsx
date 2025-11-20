@@ -10,7 +10,7 @@ export  default function Carrito() {
 
     const [carrito, setCarrito] = useCarritoGlobal();
     const [objetoDePago, setObjetoDePago] = useObjetosPagosGlobales();
-    const [nuevaCantidad,setNuevaCantidad] = useState(0);
+    const [nuevaCantidad,setNuevaCantidad] = useState(1);
     const [idSeleccionado, setIdSeleccionado] = useState(null);
 
 
@@ -105,7 +105,7 @@ function actualizarValorUnidades(id_producto) {
 
 
                 <input type={"number"}
-                       min={0}
+                       min={1}
                        max={10}
                        step={1}
                        value={nuevaCantidad}
