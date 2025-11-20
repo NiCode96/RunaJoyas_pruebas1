@@ -2,7 +2,7 @@
 import {useSearchParams} from "next/navigation";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
-import {useEffect, useState} from "react";
+import { useEffect, useState, Suspense } from "react";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {ShadcnSelect} from "@/Componentes/shadcnSelect";
 import {ShadcnTable} from "@/Componentes/shadcnTable";
@@ -11,8 +11,8 @@ import Link from "next/link";
 import {Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 
 
-export default function PedidoDetalle(){
-    const searchParams = new useSearchParams();
+function PedidoDetalleInner(){
+    const searchParams = useSearchParams();
     const id_pedido = searchParams.get("id");
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [detalleComprador, setDetalleComprador] = useState([]);
@@ -44,8 +44,10 @@ export default function PedidoDetalle(){
     }
 
     useEffect(() => {
-        obtenerDetallesComprador(id_pedido)
-    }, [])
+        if (id_pedido) {
+            obtenerDetallesComprador(id_pedido);
+        }
+    }, [id_pedido]);
 
 
 
@@ -126,8 +128,10 @@ async function cambiarEstado(id_pedido, nuevoestado){
     }
 
     useEffect(() => {
-        obtenerListaDetallada(id_pedido)
-    }, [])
+        if (id_pedido) {
+            obtenerListaDetallada(id_pedido);
+        }
+    }, [id_pedido]);
 
     const pedidoDetalle = listaDetallada || [{id_producto: 0, tituloProducto: "SIN DATO", cantidad: 0, precio_unitario: 0}]
 
@@ -276,5 +280,13 @@ async function cambiarEstado(id_pedido, nuevoestado){
             </div>
         </div>
     </div>
+    );
+}
+
+export default function PedidoDetalle() {
+    return (
+        <Suspense fallback={<div className="p-4">Cargando detalle del pedido...</div>}>
+            <PedidoDetalleInner />
+        </Suspense>
     );
 }
