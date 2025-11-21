@@ -445,7 +445,7 @@ function CatalogoInner() {
                                        onClick={() => {agregarAlCarrito(producto)}}
                                        className="
       w-full
-      py-3 sm:py-3.5
+     p-3
       px-4
       bg-white
       border border-amber-900
@@ -458,10 +458,40 @@ function CatalogoInner() {
       transition-all duration-300 ease-in-out
       hover:border-4
       focus:outline-none focus-visible:ring-2  focus-visible:ring-amber-900/40
+      hidden md:block
     "
                                        title="Añadir al carrito"
                                    >
                                        Añadir al carrito
+                                   </button>
+
+
+
+
+
+                                   <button
+                                       onClick={() => {agregarAlCarrito(producto)}}
+                                       className="
+      w-full
+     p-2
+      px-4
+      bg-white
+      border border-amber-900
+      text-amber-900
+
+      font-medium
+      uppercase
+      tracking-[0.20em]
+      flex items-center justify-center
+      transition-all duration-300 ease-in-out
+      hover:border-4
+      focus:outline-none focus-visible:ring-2  focus-visible:ring-amber-900/40
+      md:hidden
+    "
+                                       style={{fontSize: '12px'}}
+                                       title="Añadir al carrito"
+                                   >
+                                       Añadir  <ShoppingCartIcon className="h-5 w-5"/>
                                    </button>
                                </div>
 
