@@ -430,7 +430,7 @@ function CatalogoInner() {
                                    </Link>
 
                                    {/* Título estilo catálogo, mayúsculas y con tracking amplio */}
-         <h3 className="mt-3 text-gray-900 tracking-[0.15em] font-[Playfair_Display]" style={{fontSize: '12px'}}>
+         <h3 className="mt-3 text-gray-900 " style={{fontSize: '15px'}}>
                   {producto.tituloProducto}
                </h3>
 
@@ -445,7 +445,7 @@ function CatalogoInner() {
                                        onClick={() => {agregarAlCarrito(producto)}}
                                        className="
       w-full
-     p-3
+     p-2
       px-4
       bg-white
       border border-amber-900

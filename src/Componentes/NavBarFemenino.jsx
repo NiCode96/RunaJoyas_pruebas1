@@ -33,14 +33,22 @@ import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 
 // Enlaces externos (placeholder) para Más Vendidos
 // const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
-const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
+// const MAS_VENDIDOS_URL = 'https://plataforma-mas-vendidos.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
 
 
 
 function ResponsiveAppBar() {
 
-    const [carrito, setCarrito] = useCarritoGlobal();
-    let cantidadProductosCarrito = carrito.length ?? 0;
+    // setCarrito no se usa en este componente, renombramos para evitar warning
+    const [carrito, _setCarrito] = useCarritoGlobal();
+    // Evitar mismatch de hidratación: durante SSR y el primer render del cliente
+    // mostramos 0 y solo después del montaje real aplicamos el valor real.
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const cantidadProductosCarrito = isMounted ? (carrito?.length ?? 0) : 0;
 
 
     const [listaCategorias, setListaCategorias] = React.useState([]);
@@ -56,7 +64,7 @@ function ResponsiveAppBar() {
 
             if(!res.ok) {
                 toast.error("No fue posible cargar las categorías. Consulte a Soporte Informático de NativeCode.cl");
-                return;
+                // no return necesario aquí (fin de la rama)
             }else {
                 const dataCategorias = await res.json();
                 setListaCategorias(dataCategorias);
@@ -303,9 +311,9 @@ function ResponsiveAppBar() {
 <Link href="/carrito">
     <IconButton size="large" color="inherit" aria-label="Carrito de compras">
         <Badge badgeContent={cantidadProductosCarrito} showZero overlap="circular" color="primary">
-            <ShoppingCartOutlinedIcon />
-        </Badge>
-    </IconButton>
+             <ShoppingCartOutlinedIcon />
+         </Badge>
+     </IconButton>
 </Link>
                          </Tooltip>
                      </Box>

@@ -5,176 +5,207 @@ import {useObjetosPagosGlobales} from "@/ContextosGlobales/ObjetoPagarContext";
 import Link from "next/link";
 import {toast} from "react-hot-toast";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
+import {
+    ButtonGroup,
+    // ButtonGroupSeparator,
+    // ButtonGroupText,
+} from "@/components/ui/button-group"
+
+import { Button } from "@/components/ui/button"
+
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 
-export  default function Carrito() {
+
+
+export default function Carrito() {
 
     const [carrito, setCarrito] = useCarritoGlobal();
-    const [objetoDePago, setObjetoDePago] = useObjetosPagosGlobales();
-    const [nuevaCantidad,setNuevaCantidad] = useState(0);
+    const [_objetoDePago, _setObjetoDePago] = useObjetosPagosGlobales();
+    const [_nuevaCantidad, _setNuevaCantidad] = useState(0);
     const [idSeleccionado, setIdSeleccionado] = useState(null);
-
-
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => { setIsMounted(true); }, []);
 
 
     const productoCatidades = {};
-    let  totalPago = 0;
+    let totalPago = 0;
 
     for (const productos of carrito) {
         if (productoCatidades[productos.id_producto]) {
             productoCatidades[productos.id_producto].cantidadVendida += 1;
-        }else{
-            productoCatidades[productos.id_producto]= {...productos, cantidadVendida: 1};
+        } else {
+            productoCatidades[productos.id_producto] = {...productos, cantidadVendida: 1};
         }
     }
 
     const productosDelCarrito = Object.values(productoCatidades)
 
     useEffect(() => {
-      if (
-        productosDelCarrito.length > 0 &&
-        (idSeleccionado === null ||
-          !productosDelCarrito.some(p => p.id_producto === idSeleccionado))
-      ) {
-        setIdSeleccionado(productosDelCarrito[0].id_producto);
-      }
-    }, [productosDelCarrito]);
+        // Solo ejecutar esta lógica después del montaje para evitar mismatch SSR/cliente
+        if (!isMounted) return;
+        if (
+            productosDelCarrito.length > 0 &&
+            (idSeleccionado === null ||
+                !productosDelCarrito.some(p => p.id_producto === idSeleccionado))
+        ) {
+            setIdSeleccionado(productosDelCarrito[0].id_producto);
+        }
+    }, [productosDelCarrito, isMounted]);
 
     for (const producto of productosDelCarrito) {
         totalPago += (producto.valorProducto * producto.cantidadVendida);
     }
 
 
+    function quitarDelCarrito(id_producto) {
+        try {
+            if (!id_producto) {
+                return toast.error('Debe seleccionar un producto para quitarlo del carrito!');
+            } else {
+                const nuevoCarrito = carrito.filter(producto => {
+                    return producto.id_producto !== id_producto
+                });
+                setCarrito(nuevoCarrito);
+            }
 
-function actualizarValorUnidades(id_producto) {
-    try {
-        if (!id_producto) {
-            toast.error("Debe Seleccionar el objeto que desea modificar la cantidad para ser comprado.")
-        } else {
-          const idNum = Number(id_producto);
-          if (!Number.isFinite(idNum)) {
-            return toast.error("ID de producto inválido");
-          }
-          if (nuevaCantidad < 0) {
-            return toast.error("La cantidad no puede ser negativa");
-          }
-
-          // Buscar un ejemplar base del producto en el carrito o en el listado agregado
-          const productoBase = carrito.find(p => p.id_producto === idNum) || productosDelCarrito.find(p => p.id_producto === idNum);
-          if (!productoBase) {
-            return toast.error("No se ha encontrado el producto seleccionado");
-          }
-
-          // 1) Quitamos todas las ocurrencias del producto del carrito actual
-          const carritoSinProducto = carrito.filter(p => p.id_producto !== idNum);
-
-          // 2) Agregamos 'nuevaCantidad' copias del producto (tu modelo usa copias para contar unidades)
-          const nuevoCarrito = [...carritoSinProducto];
-          for (let i = 0; i < Number(nuevaCantidad); i++) {
-            nuevoCarrito.push({ ...productoBase });
-          }
-
-          setCarrito(nuevoCarrito);
-          return toast.success("Cantidad actualizada correctamente");
+        } catch (e) {
+            return toast.error("No se puede eliminar el producto del carrito. Pruebe mas tarde");
         }
-    } catch(err) {
-        console.log(err);
-        return toast.error("Ha ocurrido un problema : " + err.message);
     }
-}
+
+
+
+    function aumentarCantidad(id_producto) {
+        try {
+            if (!id_producto) {
+                return toast.error('Debe seleccionar un producto para poder aumentar su cantidad.');
+            } else {
+
+                const productoAumentar = carrito.find(producto => producto.id_producto === id_producto);
+                if (!productoAumentar) {
+                    return toast.error("No se ha encontrado el producto que se quiere aumentar");
+                }else{
+                    setCarrito([...carrito, {...productoAumentar}]);
+                }
+
+            }
+        } catch (e) {
+            console.log(e);
+            return toast.error("No se puede aumentar la cantidad. Si necesita mas cantidad contacte a la tienda.");
+        }
+
+    }
+
+
+
+    function disminuirCantidad(id_producto) {
+        try {
+            if (!id_producto) {
+                return toast.error('Debe seleccionar un producto para poder bajar su cantidad.');
+            } else {
+                const productoEliminar = carrito.findIndex(producto => producto.id_producto === id_producto);
+                if (productoEliminar === -1) {
+                    return toast.error("No se ha encontrado el producto que se quiere aumentar");
+                }else{
+                    const nuevoCarritoConProductoEliminado = [...carrito];
+                    nuevoCarritoConProductoEliminado.splice(productoEliminar, 1);
+                    setCarrito(nuevoCarritoConProductoEliminado);
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            return toast.error("No se puede aumentar la cantidad. Si necesita mas cantidad contacte a la tienda.");
+        }
+
+    }
 
 
     return (
-      <div className="mt-20 mx-auto max-w-3xl px-6 py-16">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 border-b border-gray-200 pb-3">Tu Carrito</h1>
-        <ul className="divide-y divide-gray-200 rounded-xl bg-white shadow-md">
+        <div className="mt-20">
+            <div className="p-15">
 
-            <div className="ml-5 sm:col-span-2">
-                <p className="text-gray-500">Modificar Cantidad</p>
+                <h1 className="text-blue-800 text-4xl font-bold">Carrito de Compras</h1>
 
-       <select
-         className="p-2 w-70 md:w-100 border-2 border-blue-600 rounded-lg"
-         value={idSeleccionado ?? ''}
-         onChange={(e) => setIdSeleccionado(Number(e.target.value))}
-       >
-           {productosDelCarrito.map((producto) => (
-               <option key={producto.id_producto} value={producto.id_producto}>{producto.tituloProducto}</option>
-           ))}
-       </select>
-                <br/><br/>
+                <Table className="w-full mt-8  rounded-xl overflow-hidden shadow-sm bg-white">
+                    <TableCaption></TableCaption>
+                    <TableHeader className="bg-gray-100">
+                        <TableRow className="text-gray-700">
+                            <TableHead
+                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Producto</TableHead>
+                            <TableHead
+                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Referencia</TableHead>
+                            <TableHead
+                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Unidades</TableHead>
+                            <TableHead
+                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Aumentar/Disminuir</TableHead>
+                            <TableHead className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Valor
+                                Unidad</TableHead>
+                            <TableHead
+                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">SubTotal</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {isMounted && productosDelCarrito.map((producto) => (
+                            <TableRow key={producto.id_producto} className="hover:bg-gray-50 transition-colors">
+                                <TableCell
+                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b font-medium">
+                                    <span className="text-blue-700">{producto.tituloProducto}</span>
+                                    <span className="mt-3 block"><ShadcnButton
+                                        funcion={() => quitarDelCarrito(producto.id_producto)}
+                                        nombre={"Eliminar"}/></span>
+                                </TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b"><img
+                                    src={producto.imagenProducto} alt={"Imagen Producto"} width={100}
+                                    height={100}/></TableCell>
+                                <TableCell
+                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.cantidadVendida}</TableCell>
+                                <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b">
+
+                                    <ButtonGroup aria-label="Acciones">
+                                        <Button onClick={()=>disminuirCantidad(producto.id_producto)} variant="outline">-</Button>
+                                        <Button onClick={()=>aumentarCantidad(producto.id_producto)} variant="outline">+</Button>
+                                    </ButtonGroup>
+
+                                </TableCell>
+                                <TableCell
+                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.valorProducto}</TableCell>
+                                <TableCell
+                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b text-right">{producto.cantidadVendida * producto.valorProducto}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow className="bg-gray-100 w-full font-semibold">
+                            <TableCell className="px-4 py-3 w-full text-left text-gray-700"
+                                       colSpan={3}>Total</TableCell>
+                            <TableCell className="px-4 py-3 text-right text-blue-700">$ {isMounted ? totalPago : 0}</TableCell>
+                        </TableRow>
+                    </TableFooter>
+                </Table>
 
 
-
-                <input type={"number"}
-                       min={0}
-                       max={10}
-                       step={1}
-                       value={nuevaCantidad}
-                       onChange={(event) => setNuevaCantidad(Number(event.target.value))}
-                       className="w-20 border-2 border-blue-600 rounded-lg p-2"/>
-
-
-                <button
-                  onClick={() => actualizarValorUnidades(idSeleccionado)}
-                  className="ml-3 mt-3 w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-all duration-300 active:scale-95"
-                >
-                  Actualizar
-                </button>
+                <Link href="/formularioPago">
+                    <button
+                        className="p-2 w-44 rounded-xl font-semibold
+bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600
+text-white shadow-md transition-all duration-300
+hover:scale-105 hover:shadow-xl
+hover:from-blue-600 hover:via-amber-blue hover:to-blue-800"
+                    >
+                        Ir a Pagar
+                    </button>
+                </Link>
             </div>
-
-            <br/><br/>
-
-
-          {productosDelCarrito.map((producto) => (
-            <li key={producto.id_producto} className="p-5  transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <h5 className="text-lg font-semibold text-gray-800">{producto.tituloProducto}</h5>
-
-
-                  <div>
-
-                      <img
-                          className="rounded-2"
-                          src={producto.imagenProducto} alt={"Imagen Producto"} width={100} height={100}/>
-                      <br/>
-
-
-
-
-                  </div>
-
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-700">
-                <div>
-
-                  <p className="text-gray-500">Unidades a Pagar</p>
-                  <p className="font-medium text-gray-800">{producto.cantidadVendida}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Valor por Unidad</p>
-                  <p className="font-medium text-gray-800">{producto.valorProducto}</p>
-                </div>
-                <div className="sm:col-span-2">
-                  <p className="text-gray-500">Subtotal</p>
-                  <p className="font-medium text-gray-800">{producto.cantidadVendida * producto.valorProducto}</p>
-                </div>
-
-
-              </div>
-            </li>
-          ))}
-        </ul>
-
-          <label>Total a Pagar :</label>
-          <h1>$ {totalPago}</h1>
-
-<Link href="/formularioPago">
-    <button
-        className="mt-5 w-40 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-indigo-600 hover:to-blue-500"
-    >
-        Ir a Pagar
-    </button>
-</Link>
-      </div>
+        </div>
     )
 }
