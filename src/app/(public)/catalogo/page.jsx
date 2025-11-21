@@ -413,11 +413,11 @@ function CatalogoInner() {
                                initial={{ opacity: 0, y: 10 }}
                                animate={{ opacity: 1, y: 0 }}
                                whileHover={{ scale: 1.03 }}
-                               className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full"
+                               className="flex flex-col h-full min-w-0 min-h-0 overflow-hidden break-words max-w-full"
                            >
 
 
-                               <div className="flex flex-col h-auto min-w-0 min-h-0 overflow-hidden break-words max-w-full">
+                               <div className="flex flex-col h-full min-w-0 min-h-0 overflow-hidden break-words max-w-full">
                                    <Link
                                        href={`/producto/${id}`}
                                        className="no-underline hover:no-underline inline-block focus:outline-none focus:ring-0"
@@ -429,29 +429,40 @@ function CatalogoInner() {
                                        />
                                    </Link>
 
+                                   {/* Título estilo catálogo, mayúsculas y con tracking amplio */}
+         <h3 className="mt-3 text-gray-900 tracking-[0.15em] font-[Playfair_Display]" style={{fontSize: '12px'}}>
+                  {producto.tituloProducto}
+               </h3>
 
-                                   <div className="mt-1 flex justify-center gap-2   hover:blo">
-                                       <button
-                                           onClick={() => {comparAhora(producto)}}
-                                           className="  p-2 flex items-center justify-center w-auto h-9  bg-sky-50 hover:bg-sky-800 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2  hover:text-white"
-                                           title="Comprar Ahora"
-                                       >
-                                           Comprar
-                                       </button>
+               {/* Precio más marcado */}
+               <p className="mt-3 text-gray-900 text-[16px] font-[Playfair_Display]">
+                   ${producto.valorProducto}
+               </p>
+                               </div>
 
-                                       <button
-                                           onClick={() => {agregarAlCarrito(producto)}}
-                                           className="  p-2 flex items-center justify-center w-auto h-9  bg-sky-50 hover:bg-sky-800 text-gray-700 shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2  hover:text-white"
-                                           title="Añadir al carrito"
-                                       >
-                                           <ShoppingCartIcon className="w-5 h-5"></ShoppingCartIcon>
-                                       </button>
-
-                                   </div>
-
-
-                                   <label >{producto.tituloProducto}</label>
-                                   <p className="text-gray-500"> ${producto.valorProducto}</p>
+                               <div className="mt-3 flex justify-center">
+                                   <button
+                                       onClick={() => {agregarAlCarrito(producto)}}
+                                       className="
+      w-full
+      py-3 sm:py-3.5
+      px-4
+      bg-white
+      border border-amber-900
+      text-amber-900
+      text-sm sm:text-base
+      font-medium
+      uppercase
+      tracking-[0.20em]
+      flex items-center justify-center
+      transition-all duration-300 ease-in-out
+      hover:border-4
+      focus:outline-none focus-visible:ring-2  focus-visible:ring-amber-900/40
+    "
+                                       title="Añadir al carrito"
+                                   >
+                                       Añadir al carrito
+                                   </button>
                                </div>
 
                            </motion.div>
