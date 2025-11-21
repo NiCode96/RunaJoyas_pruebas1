@@ -4,13 +4,14 @@ import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 import {useObjetosPagosGlobales} from "@/ContextosGlobales/ObjetoPagarContext";
 import Link from "next/link";
 import {toast} from "react-hot-toast";
+import {ShadcnButton} from "@/Componentes/shadcnButton";
 
 
 export  default function Carrito() {
 
     const [carrito, setCarrito] = useCarritoGlobal();
     const [objetoDePago, setObjetoDePago] = useObjetosPagosGlobales();
-    const [nuevaCantidad,setNuevaCantidad] = useState(1);
+    const [nuevaCantidad,setNuevaCantidad] = useState(0);
     const [idSeleccionado, setIdSeleccionado] = useState(null);
 
 
@@ -105,7 +106,7 @@ function actualizarValorUnidades(id_producto) {
 
 
                 <input type={"number"}
-                       min={1}
+                       min={0}
                        max={10}
                        step={1}
                        value={nuevaCantidad}
@@ -129,9 +130,18 @@ function actualizarValorUnidades(id_producto) {
               <div className="flex items-center justify-between mb-2">
                 <h5 className="text-lg font-semibold text-gray-800">{producto.tituloProducto}</h5>
 
-                <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100 shadow-sm">
-                  Codigo Producto: #{producto.id_producto}
-                </span>
+
+                  <div>
+
+                      <img
+                          className="rounded-2"
+                          src={producto.imagenProducto} alt={"Imagen Producto"} width={100} height={100}/>
+                      <br/>
+
+
+
+
+                  </div>
 
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-gray-700">
