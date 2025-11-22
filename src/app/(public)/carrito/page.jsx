@@ -85,6 +85,7 @@ export default function Carrito() {
 
 
 
+
     function aumentarCantidad(id_producto) {
         try {
             if (!id_producto) {
@@ -105,6 +106,7 @@ export default function Carrito() {
         }
 
     }
+
 
 
 
@@ -130,81 +132,140 @@ export default function Carrito() {
     }
 
 
+
+    // Reemplazo del render: mantengo toda la lógica pero muestro tabla en md+ y tarjetas en móvil
     return (
         <div className="mt-20">
-            <div className="p-15">
+            <div className="p-4 sm:p-6">
 
-                <h1 className="text-blue-800 text-4xl font-bold">Carrito de Compras</h1>
+                <h1 className="text-blue-800 text-3xl sm:text-4xl font-bold">Carrito de Compras</h1>
 
-                <Table className="w-full mt-8  rounded-xl overflow-hidden shadow-sm bg-white">
-                    <TableCaption></TableCaption>
-                    <TableHeader className="bg-gray-100">
-                        <TableRow className="text-gray-700">
-                            <TableHead
-                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Producto</TableHead>
-                            <TableHead
-                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Referencia</TableHead>
-                            <TableHead
-                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Unidades</TableHead>
-                            <TableHead
-                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Aumentar/Disminuir</TableHead>
-                            <TableHead className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Valor
-                                Unidad</TableHead>
-                            <TableHead
-                                className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">SubTotal</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isMounted && productosDelCarrito.map((producto) => (
-                            <TableRow key={producto.id_producto} className="hover:bg-gray-50 transition-colors">
-                                <TableCell
-                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b font-medium">
-                                    <span className="text-blue-700">{producto.tituloProducto}</span>
-                                    <span className="mt-3 block"><ShadcnButton
-                                        funcion={() => quitarDelCarrito(producto.id_producto)}
-                                        nombre={"Eliminar"}/></span>
-                                </TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b"><img
-                                    src={producto.imagenProducto} alt={"Imagen Producto"} width={100}
-                                    height={100}/></TableCell>
-                                <TableCell
-                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.cantidadVendida}</TableCell>
-                                <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b">
+                {/* Mensaje cuando no hay productos */}
+                {isMounted && productosDelCarrito.length === 0 && (
+                    <div className="mt-8 bg-white rounded-lg p-6 shadow-sm text-gray-700">
+                        Tu carrito está vacío.
+                    </div>
+                )}
 
-                                    <ButtonGroup aria-label="Acciones">
-                                        <Button onClick={()=>disminuirCantidad(producto.id_producto)} variant="outline">-</Button>
-                                        <Button onClick={()=>aumentarCantidad(producto.id_producto)} variant="outline">+</Button>
-                                    </ButtonGroup>
-
-                                </TableCell>
-                                <TableCell
-                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.valorProducto}</TableCell>
-                                <TableCell
-                                    className="px-4 py-4 text-sm text-gray-800 align-middle border-b text-right">{producto.cantidadVendida * producto.valorProducto}</TableCell>
+                {/* VISTA ESCRITORIO: tabla (md+) */}
+                <div className="hidden md:block">
+                    <Table className="w-full mt-8 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <TableCaption></TableCaption>
+                        <TableHeader className="bg-gray-100">
+                            <TableRow className="text-gray-700">
+                                <TableHead
+                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Producto</TableHead>
+                                <TableHead
+                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Referencia</TableHead>
+                                <TableHead
+                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Unidades</TableHead>
+                                <TableHead
+                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Aumentar/Disminuir</TableHead>
+                                <TableHead className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Valor
+                                    Unidad</TableHead>
+                                <TableHead
+                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">SubTotal</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                    <TableFooter>
-                        <TableRow className="bg-gray-100 w-full font-semibold">
-                            <TableCell className="px-4 py-3 w-full text-left text-gray-700"
-                                       colSpan={3}>Total</TableCell>
-                            <TableCell className="px-4 py-3 text-right text-blue-700">$ {isMounted ? totalPago : 0}</TableCell>
-                        </TableRow>
-                    </TableFooter>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {isMounted && productosDelCarrito.map((producto) => (
+                                <TableRow key={producto.id_producto} className="hover:bg-gray-50 transition-colors">
+                                    <TableCell
+                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b font-medium">
+                                        <span className="text-blue-700">{producto.tituloProducto}</span>
+                                        <span className="mt-3 block"><ShadcnButton
+                                            funcion={() => quitarDelCarrito(producto.id_producto)}
+                                            nombre={"Eliminar"}/></span>
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b"><img
+                                        src={producto.imagenProducto} alt={"Imagen Producto"} width={100}
+                                        height={100} className="object-cover rounded"/></TableCell>
+                                    <TableCell
+                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.cantidadVendida}</TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b">
 
+                                        <ButtonGroup aria-label="Acciones">
+                                            <Button onClick={()=>disminuirCantidad(producto.id_producto)} variant="outline">-</Button>
+                                            <Button onClick={()=>aumentarCantidad(producto.id_producto)} variant="outline">+</Button>
+                                        </ButtonGroup>
 
-                <Link href="/formularioPago">
-                    <button
-                        className="p-2 w-44 rounded-xl font-semibold
-bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600
-text-white shadow-md transition-all duration-300
-hover:scale-105 hover:shadow-xl
-hover:from-blue-600 hover:via-amber-blue hover:to-blue-800"
-                    >
-                        Ir a Pagar
-                    </button>
-                </Link>
+                                    </TableCell>
+                                    <TableCell
+                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.valorProducto}</TableCell>
+                                    <TableCell
+                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b text-right">{producto.cantidadVendida * producto.valorProducto}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow className="bg-gray-100 w-full font-semibold">
+                                <TableCell className="px-4 py-3 w-full text-left text-gray-700"
+                                           colSpan={3}>Total</TableCell>
+                                <TableCell className="px-4 py-3 text-right text-blue-700">$ {isMounted ? totalPago : 0}</TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </div>
+
+                {/* VISTA MÓVIL: tarjetas (sm) */}
+                <div className="md:hidden mt-6 space-y-4">
+                    {isMounted && productosDelCarrito.map((producto) => (
+                        <div key={producto.id_producto} className="bg-white rounded-lg shadow p-4 flex items-start gap-4">
+                            <img src={producto.imagenProducto} alt={producto.tituloProducto} className="w-20 h-20 object-cover rounded flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start">
+                                    <div className="min-w-0">
+                                        <div className="text-sm font-semibold text-blue-700 truncate">{producto.tituloProducto}</div>
+                                        <div className="text-xs text-gray-500 mt-1">Ref: {producto.id_producto}</div>
+                                    </div>
+                                    <div className="text-right ml-2 flex-shrink-0">
+                                        <div className="text-sm font-semibold text-gray-800">${producto.valorProducto}</div>
+                                        <div className="text-xs text-gray-500">Subtotal</div>
+                                    </div>
+                                </div>
+
+                                {/* Acciones: en móvil apilan si falta espacio */}
+                                <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <ButtonGroup aria-label="Acciones mobile">
+                                            <Button size="sm" onClick={()=>disminuirCantidad(producto.id_producto)} variant="outline">-</Button>
+                                            <Button size="sm" onClick={()=>aumentarCantidad(producto.id_producto)} variant="outline">+</Button>
+                                        </ButtonGroup>
+                                        <div className="text-sm text-gray-700">Unidades: <span className="font-medium">{producto.cantidadVendida}</span></div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 justify-end flex-shrink-0">
+                                        <div className="w-max">
+                                            <ShadcnButton funcion={() => quitarDelCarrito(producto.id_producto)} nombre={"Eliminar"} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Total y botón pagar en móvil */}
+                    <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+                        <div className="text-lg font-semibold text-gray-700">Total</div>
+                        <div className="text-xl font-bold text-blue-700">$ {isMounted ? totalPago : 0}</div>
+                    </div>
+                </div>
+
+                {/* Botón Ir a pagar (se mantiene visible en ambos tamaños) */}
+                <div className="mt-6">
+                    <Link href="/formularioPago">
+                        <button
+                            className="p-2 w-44 rounded-xl font-semibold
+    bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600
+    text-white shadow-md transition-all duration-300
+    hover:scale-105 hover:shadow-xl"
+                        >
+                            Ir a Pagar
+                        </button>
+                    </Link>
+                </div>
+
             </div>
         </div>
     )
