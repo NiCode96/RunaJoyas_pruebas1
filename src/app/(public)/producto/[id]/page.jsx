@@ -86,9 +86,10 @@ useEffect(() => {
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 mt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="flex items-start justify-center bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm ring-1 ring-slate-200">
+          <div className="flex items-start justify-center bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm ring-1 ring-slate-200 relative">
             {producto && (
 <Carrusel
+    key={producto.id_producto}
     imagen1={producto.imagenProducto}
     imagen2={producto.imagenProductoSegunda ?? producto.imagenProducto}
     imagen3={producto.imagenProductoTercera ?? producto.imagenProducto}
