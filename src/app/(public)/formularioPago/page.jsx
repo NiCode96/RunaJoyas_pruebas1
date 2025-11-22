@@ -168,14 +168,14 @@ const API = process.env.NEXT_PUBLIC_API_URL;
                     </label>
 
                     <label className="block">
-                      <span className="text-sm font-medium text-gray-700">Apellido</span>
+                      <span className="text-sm font-medium text-gray-700">Apellidos</span>
                       <input
                         type="text"
                         value={apellidosComprador}
                         onChange={(e) => setapellidosComprador(e.target.value)}
                         required
                         className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                        placeholder="Ej.: López"
+                        placeholder="Ej.: López Gonzalez"
                       />
                     </label>
 
@@ -270,9 +270,8 @@ const API = process.env.NEXT_PUBLIC_API_URL;
                           <textarea
                               value={comentarios}
                               onChange={(e) => setComentarios(e.target.value)}
-                              required
                               className=" p-2 mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 text-gray-900 placeholder:text-gray-400 py-2"
-                              placeholder="Ej: Necesito que mi paquete llegue a cierta hora.."
+                              placeholder="Ej: Referencia para la entrega casa interior color azul"
                           />
                       </label>
 

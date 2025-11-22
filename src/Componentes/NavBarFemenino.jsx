@@ -15,7 +15,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -30,6 +29,7 @@ import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+
 
 // Enlaces externos (placeholder) para Más Vendidos
 // const OFERTAS_URL = 'https://plataforma-ofertas.ejemplo.com'; // TODO: Reemplazar cuando exista la plataforma real
@@ -107,7 +107,37 @@ function ResponsiveAppBar() {
      const toggleCategoriasMobile = () => setOpenCategoriasMobile((prev) => !prev);
 
 
-     return (
+
+
+    //FUNCION PARA LISTAR TODOS LOS PRODUCTOS RECIENTES QUE NO TENGAN ELIMINACION LOGICA
+    async function listarRecientes(){
+        try {
+            const res = await fetch(`${API}/producto/seleccionarProductoReciente`,{
+                method: 'GET',
+                headers: {Accept: 'application/json'},
+                mode: 'cors'
+            });
+            if (!res.ok) {
+                throw new Error('No fue posible cargar los productos');
+            }
+            const dataProductos = await res.json();
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+
+
+    return (
          <AppBar
              position="fixed"
              sx={{

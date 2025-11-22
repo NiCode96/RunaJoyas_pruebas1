@@ -10,6 +10,14 @@ import MediaCardImage from "@/Componentes/MediaCardImage";
 import { motion } from "motion/react";
 import {useRouter} from "next/navigation";
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 
 export default function Catalogo() {
   return (
@@ -215,7 +223,7 @@ function CatalogoInner() {
     }
     useEffect(() => {
         if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
-            listarProductos();
+            listarRecientes();
         }
     }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
 
@@ -345,13 +353,31 @@ function CatalogoInner() {
 
 
                         <div className="ml-auto flex items-center gap-2">
-                            <span className="text-sm text-gray-500 hidden sm:inline">Ordenar:</span>
-                            <button
-                                onClick={() => ordenarMenorPrecio()}
-                                className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Menor</button>
-                            <button
-                                onClick={() => ordenarMayorPrecio()}
-                                className="text-sm px-3 py-1 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50">Precio Mayor</button>
+
+
+                            <Select onValueChange={(value) =>{
+                                if(value === "menor"){
+                                    ordenarMenorPrecio()
+                                }else if(value === "mayor"){
+                                   ordenarMayorPrecio()
+                                }else if(value === "reciente"){
+                                    listarRecientes()
+                                }else if(value === "antiguo"){
+                                    listarProductos()
+                                }
+                            }}>
+                                <SelectTrigger className="w-80">
+                                    <SelectValue  placeholder="Ordenar por" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="menor">Precio, menor a mayor</SelectItem>
+                                    <SelectItem value="mayor">Precio, mayor a menor</SelectItem>
+                                    <SelectItem value="reciente">Fecha: reciente a antiguo(a)</SelectItem>
+                                    <SelectItem value="antiguo">Fecha: antiguo(a) a reciente</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+
                         </div>
                     </div>
                 </header>
@@ -363,7 +389,7 @@ function CatalogoInner() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
                     {/* Sidebar de publicaciones/banners: se mantiene fijo en viewport alto, sin alterar la lógica */}
-                    <aside className="hidden md:block order-2 lg:order-1 lg:col-span-1 space-y-4 sticky top-24 self-start">
+                    <aside className="order-first hidden md:block  lg:col-span-1 space-y-4 sticky top-24 self-start">
                         {/* Título del sidebar para dar contexto visual */}
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendencias</h3>
                         <p className="text-sm text-gray-500 mb-4">Lo mejor de la temporada</p>
@@ -430,17 +456,17 @@ function CatalogoInner() {
                                    </Link>
 
                                    {/* Título estilo catálogo, mayúsculas y con tracking amplio */}
-         <h3 className="mt-3 text-gray-900 " style={{fontSize: '15px'}}>
+         <h3 className="mt-1 mb-0 text-gray-900 " style={{fontSize: '15px'}}>
                   {producto.tituloProducto}
                </h3>
 
                {/* Precio más marcado */}
-               <p className="mt-3 text-gray-900 text-[16px] font-[Playfair_Display]">
+               <p className="mt-0 text-gray-500 text-[16px] ">
                    ${producto.valorProducto}
                </p>
                                </div>
 
-                               <div className="mt-3 flex justify-center">
+                               <div className=" flex justify-center">
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
                                        className="
