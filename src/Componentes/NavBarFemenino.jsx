@@ -71,7 +71,7 @@ function ResponsiveAppBar() {
                  <Toolbar disableGutters>
                      <Box
                          component={Link}
-                         href="/"
+                         href="/catalogo"
                          sx={{
                              mr: 2,
                              display: { xs: 'none', md: 'flex' },
@@ -92,6 +92,10 @@ function ResponsiveAppBar() {
                              />
                          </Box>
                      </Box>
+
+
+
+
 
                      <Box sx={{ flexGrow: 1, display: { xs: 'flex', lg: 'none' } }}>
                          <IconButton
