@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function edicionPagina() {
+export default function EdicionPagina() {
     const [nuevoTitulo, setNuevoTitulo] = useState("");
     const [mensajeSubTitulo, setmensajeSubTitulo] = useState("");
     const [mensajeSobreNosotros, setmensajeSobreNosotros] = useState("");
@@ -13,9 +13,8 @@ export default function edicionPagina() {
     const [MensajeTexto2, setMensajeTexto2] = useState("");
     // Estado para timestamp de última actualización
     const [ultimaActualizacion, setUltimaActualizacion] = useState("");
-
-    // Estados para foto de perfil
-    const [fotoPerfil, setFotoPerfil] = useState("nube.png");
+    // Estados de carga
+    const [cargando, setCargando] = useState(false);
 
     const [nuevoSubtitulo, setNuevoSubtitulo] = useState("");
     const [nuevoSobreNosotros, setNuevoSobreNosotros] = useState("");
@@ -178,15 +177,12 @@ export default function edicionPagina() {
     useEffect(() => {
         cargarTitulos();
         cargarTextos();
-        // Cargar configuración de forma independiente para no bloquear la página
-        cargarConfiguracion().catch(error => {
-            console.log('Config loading failed silently:', error.message);
-        });
         setUltimaActualizacion(new Date().toLocaleString('es-CL'));
     }, []);
 
     async function handleSubmit(e) {
         e.preventDefault();
+        setCargando(true);
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
@@ -201,16 +197,22 @@ export default function edicionPagina() {
             if (res.ok) {
                 setMensaje("✅ " + data.message);
                 localStorage.setItem('medify-titulo-principal', nuevoTitulo);
+                settitulo(nuevoTitulo);
+                setNuevoTitulo("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setMensaje("❌ " + (data.error || "No se pudo actualizar"));
             }
         } catch (err) {
-            setMensaje("Error de conexión con el backend");
+            setMensaje("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
     async function handleUpdateSubtitulo(e) {
         e.preventDefault();
+        setCargando(true);
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
@@ -225,20 +227,26 @@ export default function edicionPagina() {
             if (res.ok) {
                 setmensajeSubTitulo("✅ " + data.message);
                 localStorage.setItem('medify-subtitulo', nuevoSubtitulo);
+                setsubtitulo(nuevoSubtitulo);
+                setNuevoSubtitulo("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setmensajeSubTitulo("❌ " + (data.error || "No se pudo actualizar"));
             }
         } catch (err) {
-            setMensaje("Error de conexión con el backend");
+            setmensajeSubTitulo("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
     async function handleUpdateSobreNosotros(event) {
         event.preventDefault();
         if (!nuevoSobreNosotros || !nuevoSobreNosotros.trim()) {
-            setMensaje("Debes escribir un texto para 'Sobre nosotros'");
+            setmensajeSobreNosotros("⚠️ Debes escribir un texto para 'Sobre nosotros'");
             return;
         }
+        setCargando(true);
         try {
             // Usar la constante API en lugar de URL hardcodeada
             const res = await fetch(`${API}/titulo/sobrenosotros`, {
@@ -253,16 +261,22 @@ export default function edicionPagina() {
 
             if (res.ok) {
                 setmensajeSobreNosotros("✅ " + data.message);
+                setsobreNosotros(nuevoSobreNosotros.trim());
+                setNuevoSobreNosotros("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setmensajeSobreNosotros("❌ " + (data.error || "No se pudo actualizar"));
             }
         } catch (err) {
-            setmensajeSobreNosotros("Error de conexión con el backend");
+            setmensajeSobreNosotros("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
     async function handleSubmitProyectos(evento) {
         evento.preventDefault();
+        setCargando(true);
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
@@ -278,16 +292,22 @@ export default function edicionPagina() {
                 setmensajeProyectos(
                     "✅ Se ha cambiado el titulo de la seccion Portafolio/Proyectos"
                 );
+                settituloProyectos(nuevoTituloProyecto);
+                setnuevoTituloProyecto("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setmensajeProyectos("❌ No se ha podido cambiar el titulo");
             }
         } catch (error) {
-            setmensajeProyectos("Error de conexión con el backend");
+            setmensajeProyectos("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
     async function handleSubmitContacto(evento) {
         evento.preventDefault();
+        setCargando(true);
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
@@ -299,11 +319,16 @@ export default function edicionPagina() {
             const data = await res.json();
             if (res.ok) {
                 setMensajeContacto("✅ Se ha cambiado el titulo de la seccion Contacto");
+                settituloContacto(contactoTitulo);
+                setcontactoTitulo("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setMensajeContacto("❌ No se ha podido cambiar el titulo de la seccion Contacto");
             }
         } catch (error) {
-            setMensajeContacto("Error de conexión con el backend");
+            setMensajeContacto("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
@@ -348,24 +373,6 @@ export default function edicionPagina() {
             }
         } catch (err) {
             setMensajeTexto2("Error de conexión con el backend");
-        }
-    }
-
-    // Config
-    async function cargarConfiguracion() {
-        try {
-            // Usar la constante API en lugar de URL hardcodeada
-            const response = await fetch(`${API}/config`);
-            if (response.ok) {
-                const config = await response.json();
-                setFotoPerfil(config.fotoPerfil || "nube.png");
-            } else {
-                console.log('Config API not available, using default photo');
-                setFotoPerfil("nube.png");
-            }
-        } catch (error) {
-            console.log('Config API error, using default photo:', error.message);
-            setFotoPerfil("nube.png");
         }
     }
 
