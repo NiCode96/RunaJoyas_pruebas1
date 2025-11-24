@@ -8,7 +8,6 @@ import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 import { ShoppingCartIcon } from '@heroicons/react/24/solid';
 import MediaCardImage from "@/Componentes/MediaCardImage";
 import { motion } from "motion/react";
-import {useRouter} from "next/navigation";
 
 import {
     Select,
@@ -19,9 +18,12 @@ import {
 } from "@/components/ui/select"
 
 
-export default function Catalogo() {
+export default function Catalogo({ searchParams }) {
+  // Crear una key única basada en los parámetros para forzar re-render
+  const key = JSON.stringify(searchParams);
+
   return (
-    <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
+    <Suspense key={key} fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
       <CatalogoInner />
     </Suspense>
   );
@@ -29,63 +31,50 @@ export default function Catalogo() {
 
 
 function CatalogoInner() {
-
-
     const searchParams = useSearchParams();
+    const API = process.env.NEXT_PUBLIC_API_URL;
+    const [_carrito, setCarrito] = useCarritoGlobal();
 
+    // Estados
+    const [listaProductos, setListaProductos] = useState([]);
+    const [publicaciones, setPublicaciones] = useState([]);
+    const [listaCategorias, setListaCategorias] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Obtener parámetros de búsqueda
     const id_CategoriaNavBar = searchParams.get("id_categoriaProducto");
     const buscarOfertas = searchParams.get("ofertas");
     const buscarRecientes = searchParams.get("recientes");
-
-
-    const[listaProductos, setListaProductos] = useState([]);
-    const[publicaciones, setPublicaciones] = useState([]);
-    const [listaCategorias, setListaCategorias] = useState([]);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
-    const router = useRouter();
-    const API = process.env.NEXT_PUBLIC_API_URL;
-    const [carrito, setCarrito] = useCarritoGlobal();
-
-    useEffect(() => {
-        if(buscarRecientes){
-            listarRecientes();
-        }
-    }, [buscarRecientes]);
-
-    useEffect(() => {
-        if(buscarOfertas){
-            listarOfertas();
-        }
-    }, [buscarOfertas]);
-
-    useEffect(() => {
-        if(id_CategoriaNavBar){
-            filtrarPorCategoria(id_CategoriaNavBar);
-        }
-    }, [id_CategoriaNavBar]) ;
-
 
     function agregarAlCarrito(productoSeleccionado) {
         setCarrito(arrayProductosPrevios => [...arrayProductosPrevios, productoSeleccionado])
         toast.success("Producto Seleccionado!")
     }
 
-    function comparAhora(productoSeleccionado) {
-        try {
-            if (!productoSeleccionado) {
-                return toast.error("Debe haber seleccionado el producto para poder realziar la compra inmediata");
-            }else{
-                agregarAlCarrito(productoSeleccionado);
-                router.push("/carrito");
-
+    // Cargar productos según parámetros
+    useEffect(() => {
+        const cargarProductos = async () => {
+            setIsLoading(true);
+            try {
+                if (buscarRecientes) {
+                    await listarRecientes();
+                } else if (buscarOfertas) {
+                    await listarOfertas();
+                } else if (id_CategoriaNavBar) {
+                    await filtrarPorCategoria(id_CategoriaNavBar);
+                } else {
+                    await listarRecientes();
+                }
+            } catch (error) {
+                console.error("Error cargando productos:", error);
+                toast.error("Error al cargar productos");
+            } finally {
+                setIsLoading(false);
             }
+        };
 
-        }catch(err) {
-            console.log(err)
-            return toast.error("No se puede comprar este Articulo por problemas tecnicos. Contacte al vendedor para concretar la venta.")
-        }
-
-    }
+        cargarProductos();
+    }, [buscarRecientes, buscarOfertas, id_CategoriaNavBar]);
 
 
 
@@ -101,7 +90,9 @@ function CatalogoInner() {
                 mode: 'cors'
             });
             if (!res.ok) {
-                throw new Error('No fue posible cargar los productos');
+                console.error('No fue posible cargar los productos recientes');
+                setListaProductos([]);
+                return;
             }
             const dataProductos = await res.json();
             const productosArray = Array.isArray(dataProductos)
@@ -114,7 +105,8 @@ function CatalogoInner() {
             setListaProductos(productosArray);
 
         }catch(err){
-            console.log(err);
+            console.error('Error en listarRecientes:', err);
+            setListaProductos([]);
         }
     }
 
@@ -181,7 +173,9 @@ function CatalogoInner() {
                 mode: 'cors'
             });
             if (!res.ok) {
-                throw new Error('No fue posible cargar los productos');
+                console.error('No fue posible cargar las ofertas');
+                setListaProductos([]);
+                return;
             }
             const dataProductos = await res.json();
             const productosArray = Array.isArray(dataProductos)
@@ -194,13 +188,12 @@ function CatalogoInner() {
             setListaProductos(productosArray);
 
         }catch(err){
-            console.log(err);
+            console.error('Error en listarOfertas:', err);
+            setListaProductos([]);
         }
     }
 
-
-
-//FUNCION PARA LISTAR TODOS LOS PRODUCTOS QUE NO TENGAN ELIMINACION LOGICA
+    //FUNCION PARA LISTAR TODOS LOS PRODUCTOS QUE NO TENGAN ELIMINACION LOGICA
     async function listarProductos(){
         try {
             const res = await fetch(`${API}/producto/seleccionarProducto`,{
@@ -209,7 +202,9 @@ function CatalogoInner() {
                 mode: 'cors'
             });
             if (!res.ok) {
-                throw new Error('No fue posible cargar los productos');
+                console.error('No fue posible cargar todos los productos');
+                setListaProductos([]);
+                return;
             }
             const dataProductos = await res.json();
             const productosArray = Array.isArray(dataProductos)
@@ -222,14 +217,10 @@ function CatalogoInner() {
             setListaProductos(productosArray);
 
         }catch(err){
-            console.log(err);
+            console.error('Error en listarProductos:', err);
+            setListaProductos([]);
         }
     }
-    useEffect(() => {
-        if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
-            listarRecientes();
-        }
-    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
 
 
     async function publicacionesLaterales() {
@@ -424,7 +415,14 @@ function CatalogoInner() {
                             <h2 className="text-lg font-semibold text-gray-900">Productos</h2>
                             <span className="text-sm text-gray-500">{listaProductos?.length ?? 0} resultados</span>
                         </div>
-                        {/* Grilla de tarjetas de producto: columnas adaptativas y buen espacio entre elementos */}
+
+                        {/* Indicador de carga */}
+                        {isLoading ? (
+                            <div className="flex justify-center items-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-900"></div>
+                            </div>
+                        ) : (
+                        /* Grilla de tarjetas de producto: columnas adaptativas y buen espacio entre elementos */
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
                             {
                                 listaProductos.map((producto, index) => {
@@ -470,54 +468,20 @@ function CatalogoInner() {
                </p>
                                </div>
 
-                               <div className=" flex justify-center">
+                               <div className="flex justify-center">
+                                   {/* Versión desktop */}
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
-                                       className="
-      w-full
-     p-2
-      px-4
-      bg-white
-      border border-amber-900
-      text-amber-900
-      text-sm sm:text-base
-      font-medium
-      uppercase
-      tracking-[0.20em]
-      flex items-center justify-center
-      transition-all duration-300 ease-in-out
-      hover:border-4
-      focus:outline-none focus-visible:ring-2  focus-visible:ring-amber-900/40
-      hidden md:block
-    "
+                                       className="hidden md:flex w-full p-2 px-4 bg-white border border-amber-900 text-amber-900 text-sm sm:text-base font-medium uppercase tracking-[0.20em] items-center justify-center transition-all duration-300 ease-in-out hover:border-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-900/40"
                                        title="Añadir al carrito"
                                    >
                                        Añadir al carrito
                                    </button>
 
-
-
-
-
+                                   {/* Versión móvil */}
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
-                                       className="
-      w-full
-     p-2
-      px-4
-      bg-white
-      border border-amber-900
-      text-amber-900
-
-      font-medium
-      uppercase
-      tracking-[0.20em]
-      flex items-center justify-center
-      transition-all duration-300 ease-in-out
-      hover:border-4
-      focus:outline-none focus-visible:ring-2  focus-visible:ring-amber-900/40
-      md:hidden
-    "
+                                       className="flex md:hidden w-full p-2 px-4 bg-white border border-amber-900 text-amber-900 font-medium uppercase tracking-[0.20em] items-center justify-center transition-all duration-300 ease-in-out hover:border-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-900/40"
                                        style={{fontSize: '12px'}}
                                        title="Añadir al carrito"
                                    >
@@ -533,6 +497,7 @@ function CatalogoInner() {
                                 })
                             }
                         </div>
+                        )}
                     </section>
 
                 </div>
