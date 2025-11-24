@@ -17,10 +17,9 @@ const CTA1 = () => (
                         Tu pago ha sido aprobado!
                     </h3>
                     <p className="text-lg leading-relaxed tracking-tight text-sky-800 text-muted-foreground max-w-xl">
-                        En cuanto tu pedido sea despachado, te notificaremos inmediatamente a los datos de contacto que nos entregaste.
-                        Podrás seguir cada etapa del trayecto y conocer en qué parte del envío se encuentra tu compra.
+                        Tu pedido esta pendiente de confirmación.
 
-                        Si tienes cualquier duda o necesitas asistencia, por favor escríbenos a: <br/>
+                        En cuanto comencemos a prepararlo te notificaremos inmediatamente a los datos de contacto que nos entregaste. Podrás seguir cada etapa del trayecto y conocer en qué parte del proceso se encuentra tu compra. Si tienes dudas o necesitas asistencia, escríbenos a: <br/>
 
                         {CORREO}
                     </p>

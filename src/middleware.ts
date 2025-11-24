@@ -1,4 +1,3 @@
-
 /*
 
 // frontend/src/middleware.ts
@@ -44,9 +43,19 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     }
 
     // Evitar procesar rutas públicas que podrían crear bucles
-    const PUBLIC_ROUTES = new Set(['/no-access', '/sign-in', '/sign-up', '/sign-out', '/'])
+    // Nota: removemos '/sign-up' para que no sea considerada pública y podamos
+    // interceptar intentos de registro y redirigirlos a '/sign-in'.
+    const PUBLIC_ROUTES = new Set(['/no-access', '/sign-in', '/sign-out', '/'])
     if (PUBLIC_ROUTES.has(pathname)) {
         return NextResponse.next()
+    }
+
+    // Si intentan acceder a /sign-up (registro), forzamos redirección a /sign-in
+    // para impedir el registro desde la UI pública.
+    if (pathname === '/sign-up' || pathname.startsWith('/sign-up/')) {
+        const signinUrl = new URL('/sign-in', req.url)
+        signinUrl.searchParams.set('redirect_url', pathname)
+        return NextResponse.redirect(signinUrl)
     }
 
     // Si no es una ruta protegida, seguir
@@ -57,12 +66,12 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     // Estado de autenticación actual
     const { userId } = await auth()
 
-    // 1) Si NO está autenticado → llevar a /sign-up (como pediste)
+    // 1) Si NO está autenticado → llevar a /sign-in (no a /sign-up)
     if (!userId) {
-        const signupUrl = new URL('/sign-up', req.url)
-        // opcional: redirigir de vuelta después de completar el sign-up
-        signupUrl.searchParams.set('redirect_url', pathname)
-        return NextResponse.redirect(signupUrl)
+        const signinUrl = new URL('/sign-in', req.url)
+        // opcional: redirigir de vuelta después de completar el sign-in
+        signinUrl.searchParams.set('redirect_url', pathname)
+        return NextResponse.redirect(signinUrl)
     }
 
     try {
@@ -90,7 +99,10 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
 
 export const config = {
     matcher: [
-        // Ejecutar middleware solo para las rutas del dashboard y sus subrutas
-        '/dashboard/:path*'
+        // Ejecutar middleware para las rutas del dashboard y sus subrutas
+        '/dashboard/:path*',
+        // Incluir /sign-up para interceptar accesos a la página de registro
+        '/sign-up',
+        '/sign-up/:path*'
     ],
 }

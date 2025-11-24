@@ -134,7 +134,14 @@ function CatalogoInner() {
           return;
        }
        const dataFiltrada = await res.json();
-       setListaProductos(dataFiltrada);
+       let productosArray = [];
+
+       if(Array.isArray(dataFiltrada)){
+           productosArray = dataFiltrada
+       }else {
+           productosArray = []
+       }
+       setListaProductos(productosArray);
    }catch (error) {
        console.log(error);
    }

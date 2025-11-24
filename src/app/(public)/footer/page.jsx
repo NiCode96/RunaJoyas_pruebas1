@@ -100,9 +100,9 @@ export default function App() {
             <div className="md:col-span-4 lg:col-span-4 xl:col-span-4">
               <h6 className="text-gray-900 tracking-wide uppercase text-sm font-bold mb-3 md:mb-4">Contacto</h6>
               <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
-                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l7 6v12H5V8l7-6zm0 2.5L7 9h10L12 4.5z"/></svg> Av. Providencia 1234, Santiago, Chile</li>
-                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v1l10 6 10-6V6a2 2 0 0 0-2-2zm0 6l-8 4-8-4v8h16v-8z"/></svg> ventas@runajoyas.cl</li>
-                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.53 15.53 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.05-.24c1.15.38 2.39.59 3.54.59a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1A17.5 17.5 0 0 1 2.5 6a1 1 0 0 1 1-1H7a1 1 0 0 1 1 1c0 1.15.2 2.39.59 3.54a1 1 0 0 1-.24 1.05l-2.2 2.2z"/></svg> +56 9 9876 5432</li>
+                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l7 6v12H5V8l7-6zm0 2.5L7 9h10L12 4.5z"/></svg>Valdivia Chile</li>
+                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v1l10 6 10-6V6a2 2 0 0 0-2-2zm0 6l-8 4-8-4v8h16v-8z"/></svg> runajoyaschile@gmail.com</li>
+                <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.53 15.53 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.05-.24c1.15.38 2.39.59 3.54.59a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1A17.5 17.5 0 0 1 2.5 6a1 1 0 0 1 1-1H7a1 1 0 0 1 1 1c0 1.15.2 2.39.59 3.54a1 1 0 0 1-.24 1.05l-2.2 2.2z"/></svg> +56968343380</li>
                 <li className="flex items-start gap-2"><svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12a2 2 0 0 1 2 2v4H4V4a2 2 0 0 1 2-2zm14 8H4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10zM8 14h8v2H8v-2z"/></svg> Lun–Sáb 10:00–19:00</li>
               </ul>
             </div>
