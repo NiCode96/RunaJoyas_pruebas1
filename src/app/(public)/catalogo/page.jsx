@@ -43,31 +43,91 @@ function CatalogoInner() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
-    // 🔹 FIX: Convertir searchParams a string para forzar re-render cuando cambien los query params
-    // Esto resuelve el bug de página en blanco al navegar desde otra ruta (ej: /carrito → /catalogo?categoria=13)
-    const searchParamsString = buscar.toString();
-
-
-    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
+    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos
     useEffect(() => {
-        if(buscarRecientes){
-            listarRecientes();
+        if (buscarRecientes) {
+            (async () => {
+                try {
+                    const res = await fetch(`${API}/producto/seleccionarProductoReciente`, {
+                        method: 'GET',
+                        headers: { Accept: 'application/json' },
+                        mode: 'cors'
+                    });
+                    if (!res.ok) {
+                        throw new Error('No fue posible cargar los productos');
+                    }
+                    const dataProductos = await res.json();
+                    const productosArray = Array.isArray(dataProductos)
+                        ? dataProductos
+                        : Array.isArray(dataProductos?.productos)
+                            ? dataProductos.productos
+                            : Array.isArray(dataProductos?.data)
+                                ? dataProductos.data
+                                : [];
+                    setListaProductos(productosArray);
+                } catch (err) {
+                    console.log(err);
+                }
+            })();
         }
-    }, [buscarRecientes, searchParamsString]);
+    }, [buscarRecientes, API]);
 
-    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
+    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos
     useEffect(() => {
-        if(buscarOfertas){
-            listarOfertas();
+        if (buscarOfertas) {
+            (async () => {
+                try {
+                    const res = await fetch(`${API}/producto/seleccionarOfertas`, {
+                        method: 'GET',
+                        headers: { Accept: 'application/json' },
+                        mode: 'cors'
+                    });
+                    if (!res.ok) {
+                        throw new Error('No fue posible cargar los productos');
+                    }
+                    const dataProductos = await res.json();
+                    const productosArray = Array.isArray(dataProductos)
+                        ? dataProductos
+                        : Array.isArray(dataProductos?.productos)
+                            ? dataProductos.productos
+                            : Array.isArray(dataProductos?.data)
+                                ? dataProductos.data
+                                : [];
+                    setListaProductos(productosArray);
+                } catch (err) {
+                    console.log(err);
+                }
+            })();
         }
-    }, [buscarOfertas, searchParamsString]);
+    }, [buscarOfertas, API]);
 
-    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
+    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos - CRÍTICO para navegación desde otras rutas
     useEffect(() => {
-        if(id_CategoriaNavBar){
-            filtrarPorCategoria(id_CategoriaNavBar);
+        if (id_CategoriaNavBar) {
+            (async () => {
+                try {
+                    const res = await fetch(`${API}/producto/categoriaProducto`, {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json"
+                        },
+                        mode: "cors",
+                        body: JSON.stringify({ categoriaProducto: id_CategoriaNavBar })
+                    });
+                    if (!res.ok) {
+                        toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
+                        return;
+                    }
+                    const dataFiltrada = await res.json();
+                    const productosArray = Array.isArray(dataFiltrada) ? dataFiltrada : [];
+                    setListaProductos(productosArray);
+                } catch (error) {
+                    console.log(error);
+                }
+            })();
         }
-    }, [id_CategoriaNavBar, searchParamsString]);
+    }, [id_CategoriaNavBar, API]);
 
 
     function agregarAlCarrito(productoSeleccionado) {
@@ -236,12 +296,34 @@ function CatalogoInner() {
             console.log(err);
         }
     }
-    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
+    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos - caso por defecto (sin filtros)
     useEffect(() => {
-        if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
-            listarRecientes();
+        if (!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes) {
+            (async () => {
+                try {
+                    const res = await fetch(`${API}/producto/seleccionarProductoReciente`, {
+                        method: 'GET',
+                        headers: { Accept: 'application/json' },
+                        mode: 'cors'
+                    });
+                    if (!res.ok) {
+                        throw new Error('No fue posible cargar los productos');
+                    }
+                    const dataProductos = await res.json();
+                    const productosArray = Array.isArray(dataProductos)
+                        ? dataProductos
+                        : Array.isArray(dataProductos?.productos)
+                            ? dataProductos.productos
+                            : Array.isArray(dataProductos?.data)
+                                ? dataProductos.data
+                                : [];
+                    setListaProductos(productosArray);
+                } catch (err) {
+                    console.log(err);
+                }
+            })();
         }
-    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes, searchParamsString]);
+    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes, API]);
 
 
     async function publicacionesLaterales() {
