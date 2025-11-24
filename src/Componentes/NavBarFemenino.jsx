@@ -6,12 +6,9 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-// import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -20,15 +17,10 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import CloseIcon from '@mui/icons-material/Close';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import {useEffect, useState} from 'react';
-import { toast } from 'react-hot-toast';
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
-import {useRouter} from "next/navigation";
 
 
 // Enlaces externos (placeholder) para Más Vendidos
@@ -48,44 +40,6 @@ function ResponsiveAppBar() {
 
     const cantidadProductosCarrito = isMounted ? (carrito?.length ?? 0) : 0;
 
-
-    const [listaCategorias, setListaCategorias] = React.useState([]);
-    const API = process.env.NEXT_PUBLIC_API_URL;
-
-    async function listarCategorias() {
-        try {
-            const res = await fetch(`${API}/categorias/seleccionarCategoria`,{
-                method: "GET",
-                headers: {Accept: "application/json"},
-                mode: "cors"
-            });
-
-            if(!res.ok) {
-                toast.error("No fue posible cargar las categorías. Consulte a Soporte Informático de NativeCode.cl");
-                // no return necesario aquí (fin de la rama)
-            }else {
-                const dataCategorias = await res.json();
-                setListaCategorias(dataCategorias);
-            }
-        }catch (error) {
-            console.log(error);
-        }
-    }
-
-    useEffect(() => {
-        listarCategorias();
-    },[])
-
-
-    const router = useRouter();
-
-function cargarCategoriaCatalogo(id_categoriaProducto) {
-    router.push(`/catalogo?categoria=${id_categoriaProducto}`);
-}
-
-
-
-
     const scrollToFooter = (e) => {
         if(e){
             e.preventDefault();
@@ -96,19 +50,8 @@ function cargarCategoriaCatalogo(id_categoriaProducto) {
         }
     }
 
-    const [anchorElCategorias, setAnchorElCategorias] = React.useState(null);
-    const [openCategoriasMobile, setOpenCategoriasMobile] = React.useState(false);
-
-     const [mobileOpen, setMobileOpen] = React.useState(false);
-     const toggleMobileDrawer = () => setMobileOpen((prev) => !prev);
-
-    const handleOpenCategorias = (event) => {
-         setAnchorElCategorias(event.currentTarget);
-     };
-     const handleCloseCategorias = () => {
-         setAnchorElCategorias(null);
-     };
-     const toggleCategoriasMobile = () => setOpenCategoriasMobile((prev) => !prev);
+    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const toggleMobileDrawer = () => setMobileOpen((prev) => !prev);
 
 
     return (
@@ -185,30 +128,20 @@ function cargarCategoriaCatalogo(id_categoriaProducto) {
                              </Box>
                              <Divider />
                              <List>
-                                 {/* Categorías (colapsable en móvil) */}
+                                 {/* Catálogo */}
                                  <ListItem disablePadding>
-                                     <ListItemButton onClick={(e) => { e.stopPropagation(); toggleCategoriasMobile(); }} aria-label="Abrir categorías">
-                                         <ListItemText primary="Categorías" />
-                                         {openCategoriasMobile ? <ExpandLess /> : <ExpandMore />}
-                                     </ListItemButton>
+                                     <Link
+                                         href="/catalogo"
+                                         prefetch={false}
+                                         onClick={() => setMobileOpen(false)}
+                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                     >
+                                         <ListItemButton component="div">
+                                             <ListItemText primary="Catálogo" />
+                                         </ListItemButton>
+                                     </Link>
                                  </ListItem>
-                                 <Collapse in={openCategoriasMobile} timeout="auto" unmountOnExit>
-                                     <List component="div" disablePadding>
-                                         {listaCategorias.map((cat) => (
-                                             <ListItem key={cat.id_categoriaProducto} disablePadding>
-                                                 <ListItemButton
-                                                     component="div"
-                                                     onClick={() => {
-                                                         verDetalleCategorias(cat.id_categoriaProducto);
-                                                         setMobileOpen(false);
-                                                     }}
-                                                 >
-                                                     <ListItemText primary={cat.descripcionCategoria} />
-                                                 </ListItemButton>
-                                             </ListItem>
-                                         ))}
-                                     </List>
-                                 </Collapse>
+
 
                                  {/* Ofertas (link a otra plataforma - placeholder) */}
                                  <ListItem disablePadding>
@@ -272,16 +205,14 @@ function cargarCategoriaCatalogo(id_categoriaProducto) {
                          </Box>
                      </Box>
                      <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-end', gap: 2 }}>
-                         {/* Botón Categorías (abre menú desplegable) */}
-
-
+                         {/* Botón Catálogo */}
                          <Button
                              component={Link}
                              href="/catalogo"
                              prefetch={false}
                              sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
                          >
-                             Catalogo
+                             Catálogo
                          </Button>
 
 
