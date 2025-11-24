@@ -39,10 +39,8 @@ import {useRouter} from "next/navigation";
 
 function ResponsiveAppBar() {
 
-    // setCarrito no se usa en este componente, renombramos para evitar warning
     const [carrito, _setCarrito] = useCarritoGlobal();
-    // Evitar mismatch de hidratación: durante SSR y el primer render del cliente
-    // mostramos 0 y solo después del montaje real aplicamos el valor real.
+
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
         setIsMounted(true);
@@ -81,18 +79,9 @@ function ResponsiveAppBar() {
 
     const router = useRouter();
 
-    const verDetalleCategorias = (id) =>{
-        // Navegación manual completa para que la página /catalogo pueda obtener el id directamente
-        // Usamos el query param 'categoria' para mantener consistencia con los demás enlaces
-        const target = `/catalogo?categoria=${encodeURIComponent(id)}`;
-        if (typeof window !== 'undefined') {
-            // Forzamos una navegación completa (recarga), así la página puede manejar el query param "manualmente"
-            window.location.href = target;
-        } else {
-            // Fallback (muy raro en un componente cliente), usar router.push
-            router.push(target);
-        }
-    }
+function cargarCategoriaCatalogo(id_categoriaProducto) {
+    router.push(`/catalogo?categoria=${id_categoriaProducto}`);
+}
 
 
 
@@ -305,10 +294,10 @@ function ResponsiveAppBar() {
                              {listaCategorias.map((cat) => (
                                   <MenuItem
                                      key={cat.id_categoriaProducto}
-                                     component={Link}
-                                     href={`/catalogo?categoria=${cat.id_categoriaProducto}`}
-                                     prefetch={false}
-                                     onClick={handleCloseCategorias}
+                                     onClick={()=>{
+                                         cargarCategoriaCatalogo(cat.id_categoriaProducto);
+                                         handleCloseCategorias();
+                                     }}
                                      sx={{ textDecoration: 'none', color: 'inherit' }}
                                  >
                                      {cat.descripcionCategoria}

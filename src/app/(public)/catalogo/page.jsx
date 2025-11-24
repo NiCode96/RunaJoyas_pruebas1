@@ -33,7 +33,7 @@ function CatalogoInner() {
 
     const searchParams = useSearchParams();
 
-    const id_CategoriaNavBar = searchParams.get("id");
+    const id_CategoriaNavBar = searchParams.get("id_categoriaProducto");
     const buscarOfertas = searchParams.get("ofertas");
     const buscarRecientes = searchParams.get("recientes");
 
