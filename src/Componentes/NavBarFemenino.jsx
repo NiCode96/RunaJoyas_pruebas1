@@ -82,7 +82,16 @@ function ResponsiveAppBar() {
     const router = useRouter();
 
     const verDetalleCategorias = (id) =>{
-        router.push(`/catalogo/categoria?id=${id}`);
+        // Navegación manual completa para que la página /catalogo pueda obtener el id directamente
+        // Usamos el query param 'categoria' para mantener consistencia con los demás enlaces
+        const target = `/catalogo?categoria=${encodeURIComponent(id)}`;
+        if (typeof window !== 'undefined') {
+            // Forzamos una navegación completa (recarga), así la página puede manejar el query param "manualmente"
+            window.location.href = target;
+        } else {
+            // Fallback (muy raro en un componente cliente), usar router.push
+            router.push(target);
+        }
     }
 
 
