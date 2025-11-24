@@ -22,11 +22,28 @@ import {
 export default function Catalogo() {
   return (
     <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
-      <CatalogoInner />
+      <CatalogoInnerWrapper />
     </Suspense>
   );
 }
 
+// 🔹 FIX DEFINITIVO: Wrapper que fuerza re-mount cuando cambian los search params
+// Esto resuelve el bug de página en blanco al navegar desde otras rutas (ej: /carrito → /catalogo?categoria=13)
+// La key única garantiza que React destruya y re-cree el componente completo cuando cambien los params
+function CatalogoInnerWrapper() {
+  const searchParams = useSearchParams();
+
+  // Crear key único que incluya todos los parámetros relevantes
+  // Esto fuerza un re-mount completo del componente cuando cambian
+  const categoria = searchParams.get("categoria");
+  const ofertas = searchParams.get("ofertas");
+  const recientes = searchParams.get("recientes");
+
+  // Key dinámico que cambia cuando cualquier parámetro cambia
+  const key = `${categoria || 'sin-cat'}-${ofertas || 'sin-of'}-${recientes || 'sin-rec'}`;
+
+  return <CatalogoInner key={key} />;
+}
 
 function CatalogoInner() {
 
