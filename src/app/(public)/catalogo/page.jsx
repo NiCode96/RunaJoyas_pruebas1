@@ -43,27 +43,31 @@ function CatalogoInner() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
-    // 🔹 AÑADIR ESTO: convertir searchParams a string para que sea una dependencia reactiva
+    // 🔹 FIX: Convertir searchParams a string para forzar re-render cuando cambien los query params
+    // Esto resuelve el bug de página en blanco al navegar desde otra ruta (ej: /carrito → /catalogo?categoria=13)
     const searchParamsString = buscar.toString();
 
 
+    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
     useEffect(() => {
         if(buscarRecientes){
             listarRecientes();
         }
-    }, [buscarRecientes]);
+    }, [buscarRecientes, searchParamsString]);
 
+    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
     useEffect(() => {
         if(buscarOfertas){
             listarOfertas();
         }
-    }, [buscarOfertas]);
+    }, [buscarOfertas, searchParamsString]);
 
+    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
     useEffect(() => {
         if(id_CategoriaNavBar){
             filtrarPorCategoria(id_CategoriaNavBar);
         }
-    }, [id_CategoriaNavBar, searchParamsString]) ;
+    }, [id_CategoriaNavBar, searchParamsString]);
 
 
     function agregarAlCarrito(productoSeleccionado) {
@@ -232,11 +236,12 @@ function CatalogoInner() {
             console.log(err);
         }
     }
+    // 🔹 FIX: Añadido searchParamsString como dependencia para detectar cambios en query params
     useEffect(() => {
         if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
             listarRecientes();
         }
-    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
+    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes, searchParamsString]);
 
 
     async function publicacionesLaterales() {
