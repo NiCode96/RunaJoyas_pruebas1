@@ -71,7 +71,7 @@ function ResponsiveAppBar() {
                  <Toolbar disableGutters>
                      <Box
                          component={Link}
-                         href="/catalogo"
+                         href="/"
                          sx={{
                              mr: 2,
                              display: { xs: 'none', md: 'flex' },
