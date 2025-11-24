@@ -43,6 +43,10 @@ function CatalogoInner() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
+    // 🔹 AÑADIR ESTO: convertir searchParams a string para que sea una dependencia reactiva
+    const searchParamsString = buscar.toString();
+
+
     useEffect(() => {
         if(buscarRecientes){
             listarRecientes();
@@ -59,7 +63,7 @@ function CatalogoInner() {
         if(id_CategoriaNavBar){
             filtrarPorCategoria(id_CategoriaNavBar);
         }
-    }, [id_CategoriaNavBar]) ;
+    }, [id_CategoriaNavBar, searchParamsString]) ;
 
 
     function agregarAlCarrito(productoSeleccionado) {
