@@ -37,92 +37,91 @@ export default function EdicionPagina() {
             // Usar la constante API en lugar de URL hardcodeada
             const res = await fetch(`${API}/titulo`);
             if (!res.ok) {
-                throw new Error(
-                    "Problema en consulta a base de datos contacte equipo de soporte"
+                // Manejo suave: mostrar un mensaje en el estado y salir
+                settitulo("Problema en consulta a base de datos, contacte equipo de soporte");
+                return;
+            }
+            const data = await res.json();
+
+            let tituloPrincipal = null;
+            let subtitulo = null;
+            let nosotros = null;
+            let tituloProyectos = null;
+            let tituloContacto = null;
+            let parrafo1 = null;
+            let parrafo2 = null;
+
+            if (Array.isArray(data)) {
+                const objetoEncontrado1 = data.find(
+                    (item) => Number(item.id_titulo) === 1
                 );
-            } else {
-                const data = await res.json();
+                const objetoEncontrado2 = data.find(
+                    (item) => Number(item.id_titulo) === 2
+                );
+                const objetoEncontrado3 = data.find(
+                    (item) => Number(item.id_titulo) === 3
+                );
+                const objetoEncontrado4 = data.find(
+                    (item) => Number(item.id_titulo) === 4
+                );
+                const objetoEncontrado5 = data.find(
+                    (item) => Number(item.id_titulo) === 5
+                );
+                const objetoEncontrado6 = data.find(
+                    (item) => Number(item.id_titulo) === 6
+                );
+                const objetoEncontrado7 = data.find(
+                    (item) => Number(item.id_titulo) === 7
+                );
 
-                let tituloPrincipal = null;
-                let subtitulo = null;
-                let nosotros = null;
-                let tituloProyectos = null;
-                let tituloContacto = null;
-                let parrafo1 = null;
-                let parrafo2 = null;
+                tituloPrincipal = objetoEncontrado1;
+                subtitulo = objetoEncontrado2;
+                nosotros = objetoEncontrado3;
+                tituloProyectos = objetoEncontrado4;
+                tituloContacto = objetoEncontrado5;
+                parrafo1 = objetoEncontrado6;
+                parrafo2 = objetoEncontrado7;
+            }
 
-                if (Array.isArray(data)) {
-                    const objetoEncontrado1 = data.find(
-                        (item) => Number(item.id_titulo) === 1
-                    );
-                    const objetoEncontrado2 = data.find(
-                        (item) => Number(item.id_titulo) === 2
-                    );
-                    const objetoEncontrado3 = data.find(
-                        (item) => Number(item.id_titulo) === 3
-                    );
-                    const objetoEncontrado4 = data.find(
-                        (item) => Number(item.id_titulo) === 4
-                    );
-                    const objetoEncontrado5 = data.find(
-                        (item) => Number(item.id_titulo) === 5
-                    );
-                    const objetoEncontrado6 = data.find(
-                        (item) => Number(item.id_titulo) === 6
-                    );
-                    const objetoEncontrado7 = data.find(
-                        (item) => Number(item.id_titulo) === 7
-                    );
-
-                    tituloPrincipal = objetoEncontrado1;
-                    subtitulo = objetoEncontrado2;
-                    nosotros = objetoEncontrado3;
-                    tituloProyectos = objetoEncontrado4;
-                    tituloContacto = objetoEncontrado5;
-                    parrafo1 = objetoEncontrado6;
-                    parrafo2 = objetoEncontrado7;
+            if (tituloPrincipal) {
+                if (typeof tituloPrincipal.titulo === "string") {
+                    settitulo(tituloPrincipal.titulo);
                 }
+            }
 
-                if (tituloPrincipal) {
-                    if (typeof tituloPrincipal.titulo === "string") {
-                        settitulo(tituloPrincipal.titulo);
-                    }
+            if (subtitulo) {
+                if (typeof subtitulo.titulo === "string") {
+                    setsubtitulo(subtitulo.titulo);
                 }
+            }
 
-                if (subtitulo) {
-                    if (typeof subtitulo.titulo === "string") {
-                        setsubtitulo(subtitulo.titulo);
-                    }
+            if (nosotros) {
+                if (typeof nosotros.titulo === "string") {
+                    setsobreNosotros(nosotros.titulo);
                 }
+            }
 
-                if (nosotros) {
-                    if (typeof nosotros.titulo === "string") {
-                        setsobreNosotros(nosotros.titulo);
-                    }
+            if (tituloProyectos) {
+                if (typeof tituloProyectos.titulo === "string") {
+                    settituloProyectos(tituloProyectos.titulo);
                 }
+            }
 
-                if (tituloProyectos) {
-                    if (typeof tituloProyectos.titulo === "string") {
-                        settituloProyectos(tituloProyectos.titulo);
-                    }
+            if (tituloContacto) {
+                if (typeof tituloContacto.titulo === "string") {
+                    settituloContacto(tituloContacto.titulo);
                 }
+            }
 
-                if (tituloContacto) {
-                    if (typeof tituloContacto.titulo === "string") {
-                        settituloContacto(tituloContacto.titulo);
-                    }
+            if (parrafo1) {
+                if (typeof parrafo1.titulo === "string") {
+                    setprimerParrafo(parrafo1.titulo);
                 }
+            }
 
-                if (parrafo1) {
-                    if (typeof parrafo1.titulo === "string") {
-                        setprimerParrafo(parrafo1.titulo);
-                    }
-                }
-
-                if (parrafo2) {
-                    if (typeof parrafo2.titulo === "string") {
-                        setsegundoParrafo(parrafo2.titulo);
-                    }
+            if (parrafo2) {
+                if (typeof parrafo2.titulo === "string") {
+                    setsegundoParrafo(parrafo2.titulo);
                 }
             }
         } catch (error) {
@@ -135,37 +134,36 @@ export default function EdicionPagina() {
             // Usar la constante API en lugar de URL hardcodeada
             const res = await fetch(`${API}/textos`);
             if (!res.ok) {
-                throw new Error(
-                    "Problema en consulta a base de datos contacte equipo de soporte"
+                // Manejo suave: escribir en el estado y salir
+                settitulo("Problema en consulta a base de datos, contacte equipo de soporte");
+                return;
+            }
+            const data = await res.json();
+
+            let parrafo1 = null;
+            let parrafo2 = null;
+
+            if (Array.isArray(data)) {
+                const objetoEncontrado1 = data.find(
+                    (item) => Number(item.id_Textos) === 1
                 );
-            } else {
-                const data = await res.json();
+                const objetoEncontrado2 = data.find(
+                    (item) => Number(item.id_Textos) === 2
+                );
 
-                let parrafo1 = null;
-                let parrafo2 = null;
+                parrafo1 = objetoEncontrado1;
+                parrafo2 = objetoEncontrado2;
+            }
 
-                if (Array.isArray(data)) {
-                    const objetoEncontrado1 = data.find(
-                        (item) => Number(item.id_Textos) === 1
-                    );
-                    const objetoEncontrado2 = data.find(
-                        (item) => Number(item.id_Textos) === 2
-                    );
-
-                    parrafo1 = objetoEncontrado1;
-                    parrafo2 = objetoEncontrado2;
+            if (parrafo1) {
+                if (typeof parrafo1.contenido === "string") {
+                    setprimerParrafo(parrafo1.contenido);
                 }
+            }
 
-                if (parrafo1) {
-                    if (typeof parrafo1.contenido === "string") {
-                        setprimerParrafo(parrafo1.contenido);
-                    }
-                }
-
-                if (parrafo2) {
-                    if (typeof parrafo2.contenido === "string") {
-                        setsegundoParrafo(parrafo2.contenido);
-                    }
+            if (parrafo2) {
+                if (typeof parrafo2.contenido === "string") {
+                    setsegundoParrafo(parrafo2.contenido);
                 }
             }
         } catch (error) {
@@ -195,7 +193,7 @@ export default function EdicionPagina() {
             const data = await res.json();
 
             if (res.ok) {
-                setMensaje("✅ " + data.message);
+                setMensaje("✅ " + (data.message || "Actualizado correctamente"));
                 localStorage.setItem('medify-titulo-principal', nuevoTitulo);
                 settitulo(nuevoTitulo);
                 setNuevoTitulo("");
@@ -225,7 +223,7 @@ export default function EdicionPagina() {
             const data = await res.json();
 
             if (res.ok) {
-                setmensajeSubTitulo("✅ " + data.message);
+                setmensajeSubTitulo("✅ " + (data.message || "Actualizado"));
                 localStorage.setItem('medify-subtitulo', nuevoSubtitulo);
                 setsubtitulo(nuevoSubtitulo);
                 setNuevoSubtitulo("");
@@ -260,7 +258,7 @@ export default function EdicionPagina() {
             const data = await res.json();
 
             if (res.ok) {
-                setmensajeSobreNosotros("✅ " + data.message);
+                setmensajeSobreNosotros("✅ " + (data.message || "Actualizado"));
                 setsobreNosotros(nuevoSobreNosotros.trim());
                 setNuevoSobreNosotros("");
                 setUltimaActualizacion(new Date().toLocaleString('es-CL'));
@@ -276,9 +274,9 @@ export default function EdicionPagina() {
 
     async function handleSubmitProyectos(evento) {
         evento.preventDefault();
+        setCargando(true);
 
         try {
-            // Usar la constante API en lugar de URL hardcodeada
             const res = await fetch(`${API}/titulo/proyectos`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -289,14 +287,18 @@ export default function EdicionPagina() {
 
             if (res.ok) {
                 setmensajeProyectos(
-                    "✅ Se ha cambiado el titulo de la seccion Portafolio/Proyectos"
+                    (data.message) || "✅ Se ha cambiado el titulo de la seccion Portafolio/Proyectos"
                 );
+                setnuevoTituloProyecto("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
-                setmensajeProyectos("❌ No se ha podido cambiar el titulo");
+                setmensajeProyectos("❌ " + (data.error || "No se ha podido cambiar el titulo"));
             }
         } catch (error) {
             setmensajeProyectos("❌ Error de conexión con el backend");
-            setmensajeProyectos("Error de conexión con el backend");
+        } finally {
+            setCargando(false);
+        }
     }
 
     async function handleSubmitContacto(evento) {
@@ -304,41 +306,53 @@ export default function EdicionPagina() {
         setCargando(true);
 
         try {
-            // Usar la constante API en lugar de URL hardcodeada
+            const res = await fetch(`${API}/titulo/contacto`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contactoTitulo }),
             });
+
             const data = await res.json();
+
             if (res.ok) {
-                setMensajeContacto("✅ Se ha cambiado el titulo de la seccion Contacto");
+                setMensajeContacto("✅ " + (data.message || "Se ha cambiado el titulo de la seccion Contacto"));
                 settituloContacto(contactoTitulo);
                 setcontactoTitulo("");
                 setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
-                setMensajeContacto("❌ No se ha podido cambiar el titulo de la seccion Contacto");
+                setMensajeContacto("❌ " + (data.error || "No se ha podido cambiar el titulo de la seccion Contacto"));
             }
+        } catch (err) {
+            setMensajeContacto("❌ Error de conexión con el backend");
+        } finally {
             setCargando(false);
         }
     }
 
     async function handleSubmitText1(event) {
-            setMensajeContacto("Error de conexión con el backend");
-            // Usar la constante API en lugar de URL hardcodeada
+        event.preventDefault();
+        setCargando(true);
+
+        try {
             const res = await fetch(`${API}/textos/texto1`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ texto1 }),
             });
+
             const data = await res.json();
 
             if (res.ok) {
-                setMensajeTexto1("✅ Parrafo cambiado correctamente");
+                setMensajeTexto1("✅ " + (data.message || "Parrafo cambiado correctamente"));
+                settexto1("");
+                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setMensajeTexto1("❌ " + (data.error || "No se pudo actualizar"));
             }
         } catch (err) {
-            setMensajeTexto1("Error de conexión con el backend");
+            setMensajeTexto1("❌ Error de conexión con el backend");
+        } finally {
+            setCargando(false);
         }
     }
 
@@ -355,7 +369,7 @@ export default function EdicionPagina() {
             const data = await res.json();
 
             if (res.ok) {
-                setMensajeTexto2("✅ Parrafo cambiado correctamente");
+                setMensajeTexto2("✅ " + (data.message || "Parrafo cambiado correctamente"));
             } else {
                 setMensajeTexto2("❌ " + (data.error || "No se pudo actualizar"));
             }
@@ -421,7 +435,8 @@ export default function EdicionPagina() {
                                 <button
                                     className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                     type="submit"
-                                >
+                                    disabled={cargando}
+                                 >
                                     Guardar Cambios
                                 </button>
                             </div>
@@ -455,9 +470,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar subtítulo
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar subtítulo
+                             </button>
                             <br />
                             {mensajeSubTitulo && <p>{mensajeSubTitulo}</p>}
                         </form>
@@ -482,9 +498,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar Sobre Nosotros
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar Sobre Nosotros
+                             </button>
                             <br /> {mensajeSobreNosotros && <p>{mensajeSobreNosotros}</p>}
                         </form>
                     </div>
@@ -508,9 +525,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar titulo Proyecto
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar titulo Proyecto
+                             </button>
                             <br />
                             {mensajeProyectos && <p>{mensajeProyectos}</p>}
                         </form>
@@ -535,9 +553,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar titulo Contacto
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar titulo Contacto
+                             </button>
                             <br />
                             {MensajeContacto && <p>{MensajeContacto}</p>}
                         </form>
@@ -563,9 +582,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar Párrafo
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar Párrafo
+                             </button>
                             <br />
                             {MensajeTexto1 && <p>{MensajeTexto1}</p>}
                         </form>
@@ -591,9 +611,10 @@ export default function EdicionPagina() {
                             <button
                                 className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
                                 type="submit"
-                            >
-                                Guardar Párrafo
-                            </button>
+                                disabled={cargando}
+                             >
+                                 Guardar Párrafo
+                             </button>
                         </form>
                         <br />
                         <br />

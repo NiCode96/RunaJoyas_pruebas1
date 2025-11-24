@@ -273,37 +273,17 @@ function cargarCategoriaCatalogo(id_categoriaProducto) {
                      </Box>
                      <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'flex-end', gap: 2 }}>
                          {/* Botón Categorías (abre menú desplegable) */}
+
+
                          <Button
-                             onClick={handleOpenCategorias}
+                             component={Link}
+                             href="/catalogo"
+                             prefetch={false}
                              sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
-                             aria-controls={Boolean(anchorElCategorias) ? 'menu-categorias' : undefined}
-                             aria-haspopup="true"
-                             aria-expanded={Boolean(anchorElCategorias) ? 'true' : undefined}
                          >
-                             Categorías
+                             Catalogo
                          </Button>
-                         <Menu
-                             id="menu-categorias"
-                             anchorEl={anchorElCategorias}
-                             open={Boolean(anchorElCategorias)}
-                             onClose={handleCloseCategorias}
-                             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                             keepMounted
-                         >
-                             {listaCategorias.map((cat) => (
-                                  <MenuItem
-                                     key={cat.id_categoriaProducto}
-                                     onClick={()=>{
-                                         cargarCategoriaCatalogo(cat.id_categoriaProducto);
-                                         handleCloseCategorias();
-                                     }}
-                                     sx={{ textDecoration: 'none', color: 'inherit' }}
-                                 >
-                                     {cat.descripcionCategoria}
-                                 </MenuItem>
-                             ))}
-                         </Menu>
+
 
                          {/* Ofertas (enlace externo - placeholder) */}
                          <Button
