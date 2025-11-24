@@ -26,7 +26,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import {useEffect, useState} from 'react';
-import {useRouter} from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 
@@ -53,7 +52,7 @@ function ResponsiveAppBar() {
 
     const [listaCategorias, setListaCategorias] = React.useState([]);
     const API = process.env.NEXT_PUBLIC_API_URL;
-    const router = useRouter();
+
     async function listarCategorias() {
         try {
             const res = await fetch(`${API}/categorias/seleccionarCategoria`,{
@@ -105,36 +104,6 @@ function ResponsiveAppBar() {
          setAnchorElCategorias(null);
      };
      const toggleCategoriasMobile = () => setOpenCategoriasMobile((prev) => !prev);
-
-
-
-
-    //FUNCION PARA LISTAR TODOS LOS PRODUCTOS RECIENTES QUE NO TENGAN ELIMINACION LOGICA
-    async function listarRecientes(){
-        try {
-            const res = await fetch(`${API}/producto/seleccionarProductoReciente`,{
-                method: 'GET',
-                headers: {Accept: 'application/json'},
-                mode: 'cors'
-            });
-            if (!res.ok) {
-                throw new Error('No fue posible cargar los productos');
-            }
-            const dataProductos = await res.json();
-            const productosArray = Array.isArray(dataProductos)
-                ? dataProductos
-                : Array.isArray(dataProductos?.productos)
-                    ? dataProductos.productos
-                    : Array.isArray(dataProductos?.data)
-                        ? dataProductos.data
-                        : [];
-            setListaProductos(productosArray);
-
-        }catch(err){
-            console.log(err);
-        }
-    }
-
 
 
     return (
@@ -222,13 +191,16 @@ function ResponsiveAppBar() {
                                      <List component="div" disablePadding>
                                          {listaCategorias.map((cat) => (
                                              <ListItem key={cat.id_categoriaProducto} disablePadding>
-                                                 <ListItemButton onClick={(e) => {
-                                                     e.stopPropagation();
-                                                     setMobileOpen(false);
-                                                     router.push(`/catalogo?categoria=${cat.id_categoriaProducto}`)
-                                                 }}>
-                                                     <ListItemText primary={cat.descripcionCategoria} />
-                                                 </ListItemButton>
+                                                 <Link
+                                                     href={`/catalogo?categoria=${cat.id_categoriaProducto}`}
+                                                     prefetch={false}
+                                                     onClick={() => setMobileOpen(false)}
+                                                     style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                                 >
+                                                     <ListItemButton component="div">
+                                                         <ListItemText primary={cat.descripcionCategoria} />
+                                                     </ListItemButton>
+                                                 </Link>
                                              </ListItem>
                                          ))}
                                      </List>
@@ -236,16 +208,30 @@ function ResponsiveAppBar() {
 
                                  {/* Ofertas (link a otra plataforma - placeholder) */}
                                  <ListItem disablePadding>
-                                     <ListItemButton   onClick={() => {router.push(`/catalogo?ofertas=true`); setMobileOpen(false);}}>
-                                         <ListItemText primary="Ofertas" />
-                                     </ListItemButton>
+                                     <Link
+                                         href="/catalogo?ofertas=true"
+                                         prefetch={false}
+                                         onClick={() => setMobileOpen(false)}
+                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                     >
+                                         <ListItemButton component="div">
+                                             <ListItemText primary="Ofertas" />
+                                         </ListItemButton>
+                                     </Link>
                                  </ListItem>
 
                                  {/* Más vendidos (link a otra plataforma - placeholder) */}
                                  <ListItem disablePadding>
-                                     <ListItemButton  onClick={() => { router.push(`/catalogo?recientes=true`) ; setMobileOpen(false);}}>
-                                         <ListItemText primary="Lo mas Nuevo" />
-                                     </ListItemButton>
+                                     <Link
+                                         href="/catalogo?recientes=true"
+                                         prefetch={false}
+                                         onClick={() => setMobileOpen(false)}
+                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                     >
+                                         <ListItemButton component="div">
+                                             <ListItemText primary="Lo mas Nuevo" />
+                                         </ListItemButton>
+                                     </Link>
                                  </ListItem>
 
                                  {/* Contacto (lleva a /Footer) */}
@@ -302,10 +288,14 @@ function ResponsiveAppBar() {
                              keepMounted
                          >
                              {listaCategorias.map((cat) => (
-                                 <MenuItem key={cat.id_categoriaProducto} onClick={()=>{
-                                     handleCloseCategorias();
-                                     router.push(`/catalogo?categoria=${cat.id_categoriaProducto}`)
-                                 }}>
+                                 <MenuItem
+                                     key={cat.id_categoriaProducto}
+                                     component={Link}
+                                     href={`/catalogo?categoria=${cat.id_categoriaProducto}`}
+                                     prefetch={false}
+                                     onClick={handleCloseCategorias}
+                                     sx={{ textDecoration: 'none', color: 'inherit' }}
+                                 >
                                      {cat.descripcionCategoria}
                                  </MenuItem>
                              ))}
@@ -313,7 +303,9 @@ function ResponsiveAppBar() {
 
                          {/* Ofertas (enlace externo - placeholder) */}
                          <Button
-                             onClick={() => { router.push(`/catalogo?ofertas=true`)}}
+                             component={Link}
+                             href="/catalogo?ofertas=true"
+                             prefetch={false}
                              sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
                          >
                              Ofertas
@@ -321,7 +313,9 @@ function ResponsiveAppBar() {
 
                          {/* Más recientes (enlace externo - placeholder) */}
                          <Button
-                             onClick={() => { router.push(`/catalogo?recientes=true`)}}
+                             component={Link}
+                             href="/catalogo?recientes=true"
+                             prefetch={false}
                              sx={{ my: 1, px: 1.5, color: '#000', fontWeight: 600, textTransform: 'none', letterSpacing: '.02em', '&:hover': { color: '#b08968', backgroundColor: 'transparent' } }}
                          >
                             Recientes

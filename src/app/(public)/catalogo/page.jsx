@@ -22,28 +22,11 @@ import {
 export default function Catalogo() {
   return (
     <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
-      <CatalogoInnerWrapper />
+      <CatalogoInner />
     </Suspense>
   );
 }
 
-// 🔹 FIX DEFINITIVO: Wrapper que fuerza re-mount cuando cambian los search params
-// Esto resuelve el bug de página en blanco al navegar desde otras rutas (ej: /carrito → /catalogo?categoria=13)
-// La key única garantiza que React destruya y re-cree el componente completo cuando cambien los params
-function CatalogoInnerWrapper() {
-  const searchParams = useSearchParams();
-
-  // Crear key único que incluya todos los parámetros relevantes
-  // Esto fuerza un re-mount completo del componente cuando cambian
-  const categoria = searchParams.get("categoria");
-  const ofertas = searchParams.get("ofertas");
-  const recientes = searchParams.get("recientes");
-
-  // Key dinámico que cambia cuando cualquier parámetro cambia
-  const key = `${categoria || 'sin-cat'}-${ofertas || 'sin-of'}-${recientes || 'sin-rec'}`;
-
-  return <CatalogoInner key={key} />;
-}
 
 function CatalogoInner() {
 
@@ -60,91 +43,23 @@ function CatalogoInner() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
-    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos
     useEffect(() => {
-        if (buscarRecientes) {
-            (async () => {
-                try {
-                    const res = await fetch(`${API}/producto/seleccionarProductoReciente`, {
-                        method: 'GET',
-                        headers: { Accept: 'application/json' },
-                        mode: 'cors'
-                    });
-                    if (!res.ok) {
-                        throw new Error('No fue posible cargar los productos');
-                    }
-                    const dataProductos = await res.json();
-                    const productosArray = Array.isArray(dataProductos)
-                        ? dataProductos
-                        : Array.isArray(dataProductos?.productos)
-                            ? dataProductos.productos
-                            : Array.isArray(dataProductos?.data)
-                                ? dataProductos.data
-                                : [];
-                    setListaProductos(productosArray);
-                } catch (err) {
-                    console.log(err);
-                }
-            })();
+        if(buscarRecientes){
+            listarRecientes();
         }
-    }, [buscarRecientes, API]);
+    }, [buscarRecientes]);
 
-    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos
     useEffect(() => {
-        if (buscarOfertas) {
-            (async () => {
-                try {
-                    const res = await fetch(`${API}/producto/seleccionarOfertas`, {
-                        method: 'GET',
-                        headers: { Accept: 'application/json' },
-                        mode: 'cors'
-                    });
-                    if (!res.ok) {
-                        throw new Error('No fue posible cargar los productos');
-                    }
-                    const dataProductos = await res.json();
-                    const productosArray = Array.isArray(dataProductos)
-                        ? dataProductos
-                        : Array.isArray(dataProductos?.productos)
-                            ? dataProductos.productos
-                            : Array.isArray(dataProductos?.data)
-                                ? dataProductos.data
-                                : [];
-                    setListaProductos(productosArray);
-                } catch (err) {
-                    console.log(err);
-                }
-            })();
+        if(buscarOfertas){
+            listarOfertas();
         }
-    }, [buscarOfertas, API]);
+    }, [buscarOfertas]);
 
-    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos - CRÍTICO para navegación desde otras rutas
     useEffect(() => {
-        if (id_CategoriaNavBar) {
-            (async () => {
-                try {
-                    const res = await fetch(`${API}/producto/categoriaProducto`, {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json",
-                            "Content-Type": "application/json"
-                        },
-                        mode: "cors",
-                        body: JSON.stringify({ categoriaProducto: id_CategoriaNavBar })
-                    });
-                    if (!res.ok) {
-                        toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
-                        return;
-                    }
-                    const dataFiltrada = await res.json();
-                    const productosArray = Array.isArray(dataFiltrada) ? dataFiltrada : [];
-                    setListaProductos(productosArray);
-                } catch (error) {
-                    console.log(error);
-                }
-            })();
+        if(id_CategoriaNavBar){
+            filtrarPorCategoria(id_CategoriaNavBar);
         }
-    }, [id_CategoriaNavBar, API]);
+    }, [id_CategoriaNavBar]) ;
 
 
     function agregarAlCarrito(productoSeleccionado) {
@@ -219,14 +134,9 @@ function CatalogoInner() {
           return;
        }
        const dataFiltrada = await res.json();
-       let productosArray = [];
 
-       if(Array.isArray(dataFiltrada)){
-           productosArray = dataFiltrada
-       }else {
-           productosArray = []
-       }
-       setListaProductos(productosArray);
+       const productosArray = Array.isArray(dataFiltrada)
+       setListaProductos(dataFiltrada);
    }catch (error) {
        console.log(error);
    }
@@ -313,34 +223,11 @@ function CatalogoInner() {
             console.log(err);
         }
     }
-    // 🔹 FIX: Lógica movida dentro del useEffect para evitar closures obsoletos - caso por defecto (sin filtros)
     useEffect(() => {
-        if (!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes) {
-            (async () => {
-                try {
-                    const res = await fetch(`${API}/producto/seleccionarProductoReciente`, {
-                        method: 'GET',
-                        headers: { Accept: 'application/json' },
-                        mode: 'cors'
-                    });
-                    if (!res.ok) {
-                        throw new Error('No fue posible cargar los productos');
-                    }
-                    const dataProductos = await res.json();
-                    const productosArray = Array.isArray(dataProductos)
-                        ? dataProductos
-                        : Array.isArray(dataProductos?.productos)
-                            ? dataProductos.productos
-                            : Array.isArray(dataProductos?.data)
-                                ? dataProductos.data
-                                : [];
-                    setListaProductos(productosArray);
-                } catch (err) {
-                    console.log(err);
-                }
-            })();
+        if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
+            listarRecientes();
         }
-    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes, API]);
+    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
 
 
     async function publicacionesLaterales() {
