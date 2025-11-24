@@ -22,104 +22,47 @@ import {
 export default function Catalogo() {
   return (
     <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
-      <CatalogoInnerWrapper />
+      <CatalogoInner />
     </Suspense>
   );
 }
 
-// 🔹 FIX DEFINITIVO: Wrapper que fuerza re-mount cuando cambian los search params
-// Esto resuelve el bug de página en blanco al navegar desde otras rutas (ej: /carrito → /catalogo?categoria=13)
-// La key única garantiza que React destruya y re-cree el componente completo cuando cambien los params
-function CatalogoInnerWrapper() {
-  const searchParams = useSearchParams();
-
-  // Crear key único que incluya todos los parámetros relevantes
-  // Esto fuerza un re-mount completo del componente cuando cambian
-  const categoria = searchParams.get("categoria");
-  const ofertas = searchParams.get("ofertas");
-  const recientes = searchParams.get("recientes");
-
-  // Key dinámico que cambia cuando cualquier parámetro cambia
-  const key = `${categoria || 'sin-cat'}-${ofertas || 'sin-of'}-${recientes || 'sin-rec'}`;
-
-  return <CatalogoInner key={key} />;
-}
 
 function CatalogoInner() {
 
 
-    const buscar = useSearchParams();
-    const id_CategoriaNavBar = buscar.get("categoria");
-    const buscarOfertas = buscar.get("ofertas");
-    const buscarRecientes = buscar.get("recientes");
+    const searchParams = useSearchParams();
+
+    const id_CategoriaNavBar = searchParams.get("id");
+    const buscarOfertas = searchParams.get("ofertas");
+    const buscarRecientes = searchParams.get("recientes");
+
+
     const[listaProductos, setListaProductos] = useState([]);
     const[publicaciones, setPublicaciones] = useState([]);
     const [listaCategorias, setListaCategorias] = useState([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
     const router = useRouter();
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [carrito, setCarrito] = useCarritoGlobal();
 
-    // 🔹 EFECTO PRINCIPAL: Carga productos según parámetros de búsqueda
     useEffect(() => {
-        const cargarProductos = async () => {
-            try {
-                let endpoint = '';
-                let method = 'GET';
-                let body = null;
+        if(buscarRecientes){
+            listarRecientes();
+        }
+    }, [buscarRecientes]);
 
-                if (buscarRecientes) {
-                    // Productos recientes
-                    endpoint = `${API}/producto/seleccionarProductoReciente`;
-                } else if (buscarOfertas) {
-                    // Productos en oferta
-                    endpoint = `${API}/producto/seleccionarOfertas`;
-                } else if (id_CategoriaNavBar) {
-                    // Filtrar por categoría
-                    endpoint = `${API}/producto/categoriaProducto`;
-                    method = 'POST';
-                    body = JSON.stringify({ categoriaProducto: id_CategoriaNavBar });
-                } else {
-                    // Por defecto, mostrar recientes
-                    endpoint = `${API}/producto/seleccionarProductoReciente`;
-                }
+    useEffect(() => {
+        if(buscarOfertas){
+            listarOfertas();
+        }
+    }, [buscarOfertas]);
 
-                const options = {
-                    method,
-                    headers: {
-                        Accept: 'application/json',
-                        ...(method === 'POST' && { 'Content-Type': 'application/json' })
-                    },
-                    mode: 'cors',
-                    ...(body && { body })
-                };
-
-                const res = await fetch(endpoint, options);
-
-                if (!res.ok) {
-                    if (method === 'POST') {
-                        toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
-                    }
-                    throw new Error('No fue posible cargar los productos');
-                }
-
-                const dataProductos = await res.json();
-                const productosArray = Array.isArray(dataProductos)
-                    ? dataProductos
-                    : Array.isArray(dataProductos?.productos)
-                        ? dataProductos.productos
-                        : Array.isArray(dataProductos?.data)
-                            ? dataProductos.data
-                            : [];
-
-                setListaProductos(productosArray);
-            } catch (err) {
-                console.error('Error cargando productos:', err);
-                setListaProductos([]);
-            }
-        };
-
-        cargarProductos();
-    }, [buscarRecientes, buscarOfertas, id_CategoriaNavBar, API]);
+    useEffect(() => {
+        if(id_CategoriaNavBar){
+            filtrarPorCategoria(id_CategoriaNavBar);
+        }
+    }, [id_CategoriaNavBar]) ;
 
 
     function agregarAlCarrito(productoSeleccionado) {
@@ -149,27 +92,56 @@ function CatalogoInner() {
 
 
 
-    // 🔹 FUNCIÓN AUXILIAR: Filtrar por categoría (para uso en botones del UI)
-    async function filtrarPorCategoria(categoriaProducto){
+    //FUNCION PARA LISTAR TODOS LOS PRODUCTOS RECIENTES QUE NO TENGAN ELIMINACION LOGICA
+    async function listarRecientes(){
         try {
-            if(!categoriaProducto){
-                return;
+            const res = await fetch(`${API}/producto/seleccionarProductoReciente`,{
+                method: 'GET',
+                headers: {Accept: 'application/json'},
+                mode: 'cors'
+            });
+            if (!res.ok) {
+                throw new Error('No fue posible cargar los productos');
             }
-            const res = await fetch(`${API}/producto/categoriaProducto`, {
-                method: "POST",
-                headers: {Accept: "application/json", "Content-Type": "application/json"},
-                mode: "cors",
-                body: JSON.stringify({categoriaProducto})
-            })
-            if (!res.ok){
-                toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
-                return;
-            }
-            const dataFiltrada = await res.json();
-            setListaProductos(dataFiltrada);
-        } catch (error) {
-            console.error('Error filtrando por categoría:', error);
+            const dataProductos = await res.json();
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
+
+        }catch(err){
+            console.log(err);
         }
+    }
+
+
+    //FUNCION PARA FILTRAR PRODUCTOS SEGUN CATEGORIA
+    async function filtrarPorCategoria(categoriaProducto){
+   try {
+       if(!categoriaProducto){
+           return;
+       }
+       const res = await fetch(`${API}/producto/categoriaProducto`, {
+           method: "POST",
+           headers: {Accept: "application/json",
+           "Content-Type": "application/json"},
+           mode: "cors",
+           body: JSON.stringify({categoriaProducto})
+       })
+       if (!res.ok){
+          toast.error("Problema al filtrar categorías, contacte a Soporte de NativeCode.cl");
+          return;
+       }
+       const dataFiltrada = await res.json();
+       setListaProductos(dataFiltrada);
+
+   }catch (error) {
+       console.log(error);
+   }
     }
 
 
@@ -200,7 +172,35 @@ function CatalogoInner() {
 
 
 
-    // 🔹 FUNCIÓN AUXILIAR: Listar todos los productos (para botón "Ver Todos")
+    // FUNCION PARA LLAMAR A LOS PRODUCTOS EN OFERTA ESTADO NUMERO 3 estadoProducto en base de datos
+    async function listarOfertas(){
+        try {
+            const res = await fetch(`${API}/producto/seleccionarOfertas`,{
+                method: 'GET',
+                headers: {Accept: 'application/json'},
+                mode: 'cors'
+            });
+            if (!res.ok) {
+                throw new Error('No fue posible cargar los productos');
+            }
+            const dataProductos = await res.json();
+            const productosArray = Array.isArray(dataProductos)
+                ? dataProductos
+                : Array.isArray(dataProductos?.productos)
+                    ? dataProductos.productos
+                    : Array.isArray(dataProductos?.data)
+                        ? dataProductos.data
+                        : [];
+            setListaProductos(productosArray);
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+
+
+//FUNCION PARA LISTAR TODOS LOS PRODUCTOS QUE NO TENGAN ELIMINACION LOGICA
     async function listarProductos(){
         try {
             const res = await fetch(`${API}/producto/seleccionarProducto`,{
@@ -220,35 +220,16 @@ function CatalogoInner() {
                         ? dataProductos.data
                         : [];
             setListaProductos(productosArray);
-        }catch(err){
-            console.error('Error listando productos:', err);
-        }
-    }
 
-    // 🔹 FUNCIÓN AUXILIAR: Listar recientes (para selector de ordenamiento)
-    async function listarRecientes(){
-        try {
-            const res = await fetch(`${API}/producto/seleccionarProductoReciente`,{
-                method: 'GET',
-                headers: {Accept: 'application/json'},
-                mode: 'cors'
-            });
-            if (!res.ok) {
-                throw new Error('No fue posible cargar los productos');
-            }
-            const dataProductos = await res.json();
-            const productosArray = Array.isArray(dataProductos)
-                ? dataProductos
-                : Array.isArray(dataProductos?.productos)
-                    ? dataProductos.productos
-                    : Array.isArray(dataProductos?.data)
-                        ? dataProductos.data
-                        : [];
-            setListaProductos(productosArray);
         }catch(err){
-            console.error('Error listando recientes:', err);
+            console.log(err);
         }
     }
+    useEffect(() => {
+        if(!buscarOfertas && !id_CategoriaNavBar && !buscarRecientes){
+            listarRecientes();
+        }
+    }, [buscarOfertas, id_CategoriaNavBar, buscarRecientes]);
 
 
     async function publicacionesLaterales() {

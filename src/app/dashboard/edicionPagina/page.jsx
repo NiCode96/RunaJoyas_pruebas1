@@ -276,7 +276,6 @@ export default function EdicionPagina() {
 
     async function handleSubmitProyectos(evento) {
         evento.preventDefault();
-        setCargando(true);
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
@@ -292,17 +291,12 @@ export default function EdicionPagina() {
                 setmensajeProyectos(
                     "✅ Se ha cambiado el titulo de la seccion Portafolio/Proyectos"
                 );
-                settituloProyectos(nuevoTituloProyecto);
-                setnuevoTituloProyecto("");
-                setUltimaActualizacion(new Date().toLocaleString('es-CL'));
             } else {
                 setmensajeProyectos("❌ No se ha podido cambiar el titulo");
             }
         } catch (error) {
             setmensajeProyectos("❌ Error de conexión con el backend");
-        } finally {
-            setCargando(false);
-        }
+            setmensajeProyectos("Error de conexión con el backend");
     }
 
     async function handleSubmitContacto(evento) {
@@ -311,7 +305,6 @@ export default function EdicionPagina() {
 
         try {
             // Usar la constante API en lugar de URL hardcodeada
-            const res = await fetch(`${API}/titulo/contacto`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contactoTitulo }),
@@ -325,17 +318,12 @@ export default function EdicionPagina() {
             } else {
                 setMensajeContacto("❌ No se ha podido cambiar el titulo de la seccion Contacto");
             }
-        } catch (error) {
-            setMensajeContacto("❌ Error de conexión con el backend");
-        } finally {
             setCargando(false);
         }
     }
 
     async function handleSubmitText1(event) {
-        event.preventDefault();
-
-        try {
+            setMensajeContacto("Error de conexión con el backend");
             // Usar la constante API en lugar de URL hardcodeada
             const res = await fetch(`${API}/textos/texto1`, {
                 method: "PUT",

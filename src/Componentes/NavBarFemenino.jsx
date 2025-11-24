@@ -28,6 +28,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import {useEffect, useState} from 'react';
 import { toast } from 'react-hot-toast';
 import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
+import {useRouter} from "next/navigation";
 
 
 // Enlaces externos (placeholder) para Más Vendidos
@@ -77,7 +78,15 @@ function ResponsiveAppBar() {
         listarCategorias();
     },[])
 
-    // const CATEGORIES = [{ label: 'Sin Categorioas', href: '/' },];
+
+    const router = useRouter();
+
+    const verDetalleCategorias = (id) =>{
+        router.push(`/catalogo/categoria?id=${id}`);
+    }
+
+
+
 
     const scrollToFooter = (e) => {
         if(e){
@@ -88,8 +97,6 @@ function ResponsiveAppBar() {
             }
         }
     }
-
-
 
     const [anchorElCategorias, setAnchorElCategorias] = React.useState(null);
     const [openCategoriasMobile, setOpenCategoriasMobile] = React.useState(false);
@@ -191,16 +198,15 @@ function ResponsiveAppBar() {
                                      <List component="div" disablePadding>
                                          {listaCategorias.map((cat) => (
                                              <ListItem key={cat.id_categoriaProducto} disablePadding>
-                                                 <Link
-                                                     href={`/catalogo?categoria=${cat.id_categoriaProducto}`}
-                                                     prefetch={false}
-                                                     onClick={() => setMobileOpen(false)}
-                                                     style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                                 <ListItemButton
+                                                     component="div"
+                                                     onClick={() => {
+                                                         verDetalleCategorias(cat.id_categoriaProducto);
+                                                         setMobileOpen(false);
+                                                     }}
                                                  >
-                                                     <ListItemButton component="div">
-                                                         <ListItemText primary={cat.descripcionCategoria} />
-                                                     </ListItemButton>
-                                                 </Link>
+                                                     <ListItemText primary={cat.descripcionCategoria} />
+                                                 </ListItemButton>
                                              </ListItem>
                                          ))}
                                      </List>
@@ -288,7 +294,7 @@ function ResponsiveAppBar() {
                              keepMounted
                          >
                              {listaCategorias.map((cat) => (
-                                 <MenuItem
+                                  <MenuItem
                                      key={cat.id_categoriaProducto}
                                      component={Link}
                                      href={`/catalogo?categoria=${cat.id_categoriaProducto}`}
