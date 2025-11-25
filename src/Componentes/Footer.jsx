@@ -94,7 +94,7 @@ export default function Footer() {
 
             <div className="mt-4 flex items-center gap-3">
               <Icon name="phone" className="w-5 h-5 text-gray-700" />
-              <a href="tel:+56985937487" className="!text-gray-700 text-sm !no-underline hover:">+56 9 8593 7487</a>
+              <a href="tel:+56968343380" className="!text-gray-700 text-sm !no-underline hover:underline">+56968343380</a>
             </div>
             <div className="mt-2 flex items-center gap-3">
               <Icon name="envelope" className="w-5 h-5 text-gray-700" />
@@ -155,7 +155,8 @@ export default function Footer() {
       <div className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
           <p className={`${michroma.className} text-gray-700 text-xs tracking-wide select-none`}>
-            <span className="text-base">©</span> Desarrollado por NativeCode
+            <span className="">© {new Date().getFullYear()}</span> — Desarrollado por{' '}
+            <a href="https://nativecode.cl/" target="_blank" rel="noopener noreferrer" className="text-gray-900 font-semibold hover:underline">NativeCode.cl</a>
           </p>
 
           <div className="flex items-center gap-4">
