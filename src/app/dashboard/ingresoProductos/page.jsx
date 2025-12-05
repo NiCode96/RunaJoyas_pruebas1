@@ -502,14 +502,88 @@ async function marcarOfertaProductos(id_producto) {
     cargarProductos();
   }, []);
   //FUNCION PARA CARGAR IMAGENES A CLOUDINARY
+  async function optimizeImageFile(file, maxWidth = 1400, quality = 0.78) {
+    // Solo optimizamos imágenes (no SVG, no GIFs animados). Si el archivo es pequeño, lo devolvemos tal cual.
+    if (!file || typeof document === 'undefined') return file;
+
+    const lowerType = (file.type || '').toLowerCase();
+    if (lowerType.includes('svg') || lowerType.includes('gif')) return file;
+
+    // Si ya es pequeño, evitamos procesamiento extra
+    const SIZE_THRESHOLD = 200 * 1024; // 200KB
+    if (file.size <= SIZE_THRESHOLD) return file;
+
+    // Crear imagen para obtener dimensiones
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = objectUrl;
+
+    await new Promise((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = (e) => reject(e);
+    });
+
+    // Si la imagen es menor que el maxWidth, no la escalamos pero aún así podemos recomprimir
+    const shouldResize = img.width > maxWidth;
+    const targetWidth = shouldResize ? maxWidth : img.width;
+    const scale = targetWidth / img.width;
+    const targetHeight = Math.round(img.height * scale);
+
+    // Canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Dibujar la imagen redimensionada
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Elegir formato de salida: preferimos JPEG para balance calidad/peso, salvo que sea PNG con transparencia
+    const wantsPng = lowerType.includes('png');
+    const outputType = wantsPng ? 'image/png' : 'image/jpeg';
+    const outputQuality = wantsPng ? undefined : quality;
+
+    const blob = await new Promise((resolve) => {
+      if (outputQuality !== undefined) {
+        canvas.toBlob(resolve, outputType, outputQuality);
+      } else {
+        canvas.toBlob(resolve, outputType);
+      }
+    });
+
+    // Si algo falló, devolvemos el archivo original
+    if (!blob) {
+      URL.revokeObjectURL(objectUrl);
+      return file;
+    }
+
+    // Crear un File nuevo conservando la extensión apropiada
+    const ext = outputType === 'image/png' ? '.png' : '.jpg';
+    const newFileName = (file.name || 'image').replace(/(\.[^.]+)?$/, ext);
+    const optimizedFile = new File([blob], newFileName, { type: outputType });
+
+    URL.revokeObjectURL(objectUrl);
+    return optimizedFile;
+  }
+
   async function uploadToCloudinary(file) {
+    // Optimizar imagen en cliente antes de subir (solo si es necesario)
+    let fileToUpload = file;
+    try {
+      fileToUpload = await optimizeImageFile(file);
+    } catch (err) {
+      console.warn('No se pudo optimizar la imagen en cliente, se usará el original:', err);
+      fileToUpload = file;
+    }
+
     const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
     const form = new FormData();
-    form.append("file", file);
-    form.append("upload_preset", UPLOAD_PRESET);
+    // Asegurarse de pasar un filename válido
+    form.append('file', fileToUpload, fileToUpload.name || 'upload.jpg');
+    form.append('upload_preset', UPLOAD_PRESET);
 
-    const res = await fetch(url, { method: "POST", body: form });
-    if (!res.ok) throw new Error("Error subiendo a Cloudinary");
+    const res = await fetch(url, { method: 'POST', body: form });
+    if (!res.ok) throw new Error('Error subiendo a Cloudinary');
     const data = await res.json();
     return data.secure_url; // 👈 URL final segura
   }

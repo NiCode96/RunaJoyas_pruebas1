@@ -115,8 +115,9 @@ function ResponsiveAppBar() {
                          onClose={toggleMobileDrawer}
                          sx={{ display: { xs: 'block', lg: 'none' } }}
                      >
-                         <Box sx={{ width: 280 }} role="presentation">
-                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
+                         {/* Contenedor con altura máxima y overflow para permitir scroll en móviles */}
+                         <Box sx={{ width: 280, maxHeight: '100vh', display: 'flex', flexDirection: 'column' }} role="presentation">
+                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, flex: '0 0 auto' }}>
                                  <Box sx={{ height: 28 }}>
                                      <Image
                                          src="/runaJoyasIcono.png"
@@ -131,57 +132,61 @@ function ResponsiveAppBar() {
                                  </IconButton>
                              </Box>
                              <Divider />
-                             <List>
-                                 {/* Catálogo */}
-                                 <ListItem disablePadding>
-                                     <Link
-                                         href="/catalogo"
-                                         prefetch={false}
-                                         onClick={() => setMobileOpen(false)}
-                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
-                                     >
-                                         <ListItemButton component="div">
-                                             <ListItemText primary="Catálogo" />
+
+                             {/* Aquí el contenido principal hace scroll si supera la altura disponible */}
+                             <Box sx={{ overflowY: 'auto', flex: '1 1 auto' }}>
+                                 <List>
+                                     {/* Catálogo */}
+                                     <ListItem disablePadding>
+                                         <Link
+                                             href="/catalogo"
+                                             prefetch={false}
+                                             onClick={() => setMobileOpen(false)}
+                                             style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                         >
+                                             <ListItemButton component="div">
+                                                 <ListItemText primary="Catálogo" />
+                                             </ListItemButton>
+                                         </Link>
+                                     </ListItem>
+
+
+                                     {/* Ofertas (link a otra plataforma - placeholder) */}
+                                     <ListItem disablePadding>
+                                         <Link
+                                             href="/catalogo?ofertas=true"
+                                             prefetch={false}
+                                             onClick={() => setMobileOpen(false)}
+                                             style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                         >
+                                             <ListItemButton component="div">
+                                                 <ListItemText primary="Ofertas" />
+                                             </ListItemButton>
+                                         </Link>
+                                     </ListItem>
+
+                                     {/* Más vendidos (link a otra plataforma - placeholder) */}
+                                     <ListItem disablePadding>
+                                         <Link
+                                             href="/catalogo?recientes=true"
+                                             prefetch={false}
+                                             onClick={() => setMobileOpen(false)}
+                                             style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                                         >
+                                             <ListItemButton component="div">
+                                                 <ListItemText primary="Lo mas Nuevo" />
+                                             </ListItemButton>
+                                         </Link>
+                                     </ListItem>
+
+                                     {/* Contacto (lleva a /Footer) */}
+                                     <ListItem disablePadding>
+                                         <ListItemButton onClick={(e) => { scrollToFooter(e); toggleMobileDrawer(); }}>
+                                             <ListItemText primary="Contacto" />
                                          </ListItemButton>
-                                     </Link>
-                                 </ListItem>
-
-
-                                 {/* Ofertas (link a otra plataforma - placeholder) */}
-                                 <ListItem disablePadding>
-                                     <Link
-                                         href="/catalogo?ofertas=true"
-                                         prefetch={false}
-                                         onClick={() => setMobileOpen(false)}
-                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
-                                     >
-                                         <ListItemButton component="div">
-                                             <ListItemText primary="Ofertas" />
-                                         </ListItemButton>
-                                     </Link>
-                                 </ListItem>
-
-                                 {/* Más vendidos (link a otra plataforma - placeholder) */}
-                                 <ListItem disablePadding>
-                                     <Link
-                                         href="/catalogo?recientes=true"
-                                         prefetch={false}
-                                         onClick={() => setMobileOpen(false)}
-                                         style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
-                                     >
-                                         <ListItemButton component="div">
-                                             <ListItemText primary="Lo mas Nuevo" />
-                                         </ListItemButton>
-                                     </Link>
-                                 </ListItem>
-
-                                 {/* Contacto (lleva a /Footer) */}
-                                 <ListItem disablePadding>
-                                     <ListItemButton onClick={(e) => { scrollToFooter(e); toggleMobileDrawer(); }}>
-                                         <ListItemText primary="Contacto" />
-                                     </ListItemButton>
-                                 </ListItem>
-                             </List>
+                                     </ListItem>
+                                 </List>
+                             </Box>
                          </Box>
                      </Drawer>
                      <Box
