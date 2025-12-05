@@ -15,11 +15,53 @@ function ControlledCarousel({ imagen1, imagen2, imagen3, imagen4, interval = 300
 
     return (
         <div className="w-full h-full max-h-[600px] overflow-hidden rounded-xl">
-            {/* Sobrescribir la duración de transición del carousel (Bootstrap usa .carousel-item { transition: transform .6s ... }) */}
+            {/* Sobrescribir la duración de transición del carousel */}
             <style jsx global>{`
-        /* Ajusta la duración de la animación de slide (en ms) */
+        /* Contenedor principal del carrusel */
+        .carousel {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        /* Contenedor interno con control de overflow */
+        .carousel-inner {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+        }
+        
+        /* Todos los items ocultos por defecto */
         .carousel-item {
+          position: relative;
+          display: none;
+          float: left;
+          width: 100%;
+          margin-right: -100%;
+          backface-visibility: hidden;
           transition: transform ${transitionDuration}ms ease-in-out !important;
+        }
+        
+        /* Solo el item activo visible */
+        .carousel-item.active,
+        .carousel-item-next,
+        .carousel-item-prev {
+          display: block;
+        }
+        
+        /* Posicionamiento durante transiciones */
+        .carousel-item-next:not(.carousel-item-start),
+        .active.carousel-item-end {
+          transform: translateX(100%);
+        }
+        
+        .carousel-item-prev:not(.carousel-item-end),
+        .active.carousel-item-start {
+          transform: translateX(-100%);
+        }
+        
+        .carousel-item img {
+          display: block;
+          width: 100%;
         }
       `}</style>
 
