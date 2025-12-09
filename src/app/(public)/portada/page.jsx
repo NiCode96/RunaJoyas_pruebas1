@@ -4,7 +4,6 @@ import NavBarFemenino from '@/Componentes/NavBarFemenino';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useState,useEffect} from "react";
 import {Navbar} from "react-bootstrap";
-import CarruselPortada from "@/Componentes/CarruselPortada";
 
 
 export default function Portada() {
@@ -47,7 +46,7 @@ export default function Portada() {
             <section className="mt-14 relative w-full overflow-hidden">
                 <div className="w-full ">
                     {publicacion && (
-                        <CarruselPortada
+                        <Carrusel
                             imagen1={publicacion.imagenPublicaciones_primera}
                             imagen2={publicacion.imagenPublicaciones_segunda}
                             imagen3={publicacion.imagenPublicaciones_tercera}

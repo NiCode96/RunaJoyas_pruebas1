@@ -18,12 +18,9 @@ import {
 } from "@/components/ui/select"
 
 
-export default function Catalogo({ searchParams }) {
-  // Crear una key única basada en los parámetros para forzar re-render
-  const key = JSON.stringify(searchParams);
-
+export default function Catalogo() {
   return (
-    <Suspense key={key} fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
+    <Suspense fallback={<div className="p-8 text-gray-500">Cargando catálogo…</div>}>
       <CatalogoInner />
     </Suspense>
   );
@@ -300,33 +297,35 @@ function CatalogoInner() {
             {/* Contenedor principal del catálogo: ancho máximo, centrado y espaciado vertical */}
             <div className="mt-15 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white">
                 {/* Encabezado del catálogo: título, subtítulo, breadcrumb y acciones visuales */}
-                <header className="mb-8">
+                <header className="mb-10">
 
+                    {/* Título principal delicado y elegante */}
+                    <div className="text-center mb-8">
+                        <h1 className="text-3xl md:text-5xl font-light tracking-wide text-amber-900 mb-3" style={{fontFamily: 'Georgia, serif'}}>
+                            Descubre la Colección
+                        </h1>
+                        <div className="flex justify-center mb-4">
+                            <div className="h-px w-24 bg-gradient-to-r from-transparent via-amber-700 to-transparent"></div>
+                        </div>
+                        <p className="text-sm md:text-base text-gray-500 font-light tracking-wide max-w-2xl mx-auto" style={{letterSpacing: '0.05em'}}>
+                            Piezas seleccionadas con diseño atemporal y acabados de alta calidad
+                        </p>
+                    </div>
 
-
-                    {/* Título principal llamativo y subtítulo descriptivo */}
-                    <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">Descubre la Colección</h1>
-                    <p className="mt-2 text-base md:text-lg text-gray-600">Piezas seleccionadas con diseño atemporal y acabados de alta calidad.</p>
-
-
-
-                    {/* Barra de acciones (visual/mocks): etiquetas, orden y utilidades sin alterar lógica */}
-                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                    {/* Barra de acciones con diseño delicado */}
+                    <div className="mt-8 flex flex-wrap items-center gap-4">
                       <div className="flex w-full lg:w-auto">
-                        {/* ACCESIBILIDAD: ETIQUETA OCULTA PARA LECTOR DE PANTALLA */}
                         <span className="sr-only">Filtrar por categoría</span>
-                        {/* CINTA DE CATEGORÍAS (RESPONSIVA): SCROLL HORIZONTAL EN MÓVIL */}
 
-
-                        <div className="flex gap-2 overflow-x-auto py-2 pr-2">
-
+                        {/* Cinta de categorías con diseño refinado */}
+                        <div className="flex gap-2.5 overflow-x-auto py-3 pr-2 scrollbar-hide">
                             <button
                                 key={"key"}
                                 type="button"
                                 onClick={() => listarProductos()}
-                                className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                                className="group relative whitespace-nowrap rounded-full border border-amber-200 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
                             >
-                                Ver Todos
+                                <span className="relative z-10">Ver Todos</span>
                             </button>
 
                           {listaCategorias.map((categoria) => (
@@ -334,22 +333,16 @@ function CatalogoInner() {
                               key={categoria.id_categoriaProducto}
                               type="button"
                               onClick={() => filtrarPorCategoria(categoria.id_categoriaProducto)}
-                              className="whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
+                              className="group relative whitespace-nowrap rounded-full border border-amber-200 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
                             >
-                              {categoria.descripcionCategoria}
+                              <span className="relative z-10">{categoria.descripcionCategoria}</span>
                             </button>
                           ))}
                         </div>
                       </div>
 
-
-
-
-
-
+                        {/* Selector de ordenamiento con estilo refinado */}
                         <div className="ml-auto flex items-center gap-2">
-
-
                             <Select onValueChange={(value) =>{
                                 if(value === "menor"){
                                     ordenarMenorPrecio()
@@ -361,17 +354,16 @@ function CatalogoInner() {
                                     listarProductos()
                                 }
                             }}>
-                                <SelectTrigger className="w-80">
-                                    <SelectValue  placeholder="Ordenar por" />
+                                <SelectTrigger className="w-80 border-amber-200 text-amber-900 font-light tracking-wide hover:border-amber-300 focus:ring-amber-300">
+                                    <SelectValue placeholder="Ordenar por" />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="menor">Precio, menor a mayor</SelectItem>
-                                    <SelectItem value="mayor">Precio, mayor a menor</SelectItem>
-                                    <SelectItem value="reciente">Fecha: reciente a antiguo(a)</SelectItem>
-                                    <SelectItem value="antiguo">Fecha: antiguo(a) a reciente</SelectItem>
+                                <SelectContent className="border-amber-200">
+                                    <SelectItem value="menor" className="font-light text-amber-900">Precio, menor a mayor</SelectItem>
+                                    <SelectItem value="mayor" className="font-light text-amber-900">Precio, mayor a menor</SelectItem>
+                                    <SelectItem value="reciente" className="font-light text-amber-900">Fecha: reciente a antiguo(a)</SelectItem>
+                                    <SelectItem value="antiguo" className="font-light text-amber-900">Fecha: antiguo(a) a reciente</SelectItem>
                                 </SelectContent>
                             </Select>
-
 
                         </div>
                     </div>
@@ -384,7 +376,7 @@ function CatalogoInner() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
                     {/* Sidebar de publicaciones/banners: se mantiene fijo en viewport alto, sin alterar la lógica */}
-                    <aside className="order-first hidden md:block  lg:col-span-1 space-y-4 sticky top-24 self-start">
+                    <aside className="order-first hidden lg:block  lg:col-span-1 space-y-4 sticky top-24 self-start">
                         {/* Título del sidebar para dar contexto visual */}
                         <h3 className="text-sm font-semibold text-gray-900 mb-1">Tendencias</h3>
                         <p className="text-sm text-gray-500 mb-4">Lo mejor de la temporada</p>
@@ -468,24 +460,27 @@ function CatalogoInner() {
                </p>
                                </div>
 
-                               <div className="flex justify-center">
+                               <div className="flex justify-center mt-2">
                                    {/* Versión desktop */}
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
-                                       className="hidden md:flex w-full p-2 px-4 bg-white border border-amber-900 text-amber-900 text-sm sm:text-base font-medium uppercase tracking-[0.20em] items-center justify-center transition-all duration-300 ease-in-out hover:border-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-900/40"
+                                       className="hidden md:flex w-full py-2.5 px-6 bg-withe border-2 border-gray-100 text-amber-900 items-center justify-center gap-2 transition-all duration-300 ease-in-out hover:from-amber-100 hover:to-amber-50 hover:border-amber-700 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 group"
+                                       style={{fontFamily: 'Georgia, serif', fontSize: '14px', fontWeight: '300', letterSpacing: '0.05em'}}
                                        title="Añadir al carrito"
                                    >
-                                       Añadir al carrito
+                                       <span className="text-amber-900 transition-transform group-hover:scale-105">Añadir al carrito</span>
+                                       <ShoppingCartIcon className="h-4 w-4 text-amber-900 opacity-70 group-hover:opacity-100 transition-all" />
                                    </button>
 
                                    {/* Versión móvil */}
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
-                                       className="flex md:hidden w-full p-2 px-4 bg-white border border-amber-900 text-amber-900 font-medium uppercase tracking-[0.20em] items-center justify-center transition-all duration-300 ease-in-out hover:border-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-900/40"
-                                       style={{fontSize: '12px'}}
+                                       className="flex md:hidden w-full py-2 px-4 bg-gradient-to-r from-amber-50 to-white border border-amber-200 text-amber-900 items-center justify-center gap-1.5 transition-all duration-300 ease-in-out hover:from-amber-100 hover:to-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 group"
+                                       style={{fontFamily: 'Georgia, serif', fontSize: '12px', fontWeight: '300', letterSpacing: '0.03em'}}
                                        title="Añadir al carrito"
                                    >
-                                       Añadir  <ShoppingCartIcon className="h-5 w-5"/>
+                                       <span className="text-amber-900 transition-transform group-hover:scale-105">Añadir</span>
+                                       <ShoppingCartIcon className="h-4 w-4 text-amber-700 opacity-70 group-hover:opacity-100 transition-all" />
                                    </button>
                                </div>
 
