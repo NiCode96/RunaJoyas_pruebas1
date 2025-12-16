@@ -323,7 +323,7 @@ function CatalogoInner() {
                                 key={"key"}
                                 type="button"
                                 onClick={() => listarProductos()}
-                                className="group relative whitespace-nowrap rounded-full border border-amber-200 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
+                                className="group relative whitespace-nowrap rounded-full border border-amber-900 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
                             >
                                 <span className="relative z-10">Ver Todos</span>
                             </button>
@@ -333,7 +333,7 @@ function CatalogoInner() {
                               key={categoria.id_categoriaProducto}
                               type="button"
                               onClick={() => filtrarPorCategoria(categoria.id_categoriaProducto)}
-                              className="group relative whitespace-nowrap rounded-full border border-amber-200 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
+                              className="group relative whitespace-nowrap rounded-full border border-amber-900 bg-white px-5 py-2.5 text-xs font-light text-amber-900 tracking-wider uppercase transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2"
                             >
                               <span className="relative z-10">{categoria.descripcionCategoria}</span>
                             </button>
@@ -354,10 +354,10 @@ function CatalogoInner() {
                                     listarProductos()
                                 }
                             }}>
-                                <SelectTrigger className="w-80 border-amber-200 text-amber-900 font-light tracking-wide hover:border-amber-300 focus:ring-amber-300">
+                                <SelectTrigger className="w-80  text-amber-900 font-light tracking-wide  focus:ring-amber-900">
                                     <SelectValue placeholder="Ordenar por" />
                                 </SelectTrigger>
-                                <SelectContent className="border-amber-200">
+                                <SelectContent className="border-amber-900">
                                     <SelectItem value="menor" className="font-light text-amber-900">Precio, menor a mayor</SelectItem>
                                     <SelectItem value="mayor" className="font-light text-amber-900">Precio, mayor a menor</SelectItem>
                                     <SelectItem value="reciente" className="font-light text-amber-900">Fecha: reciente a antiguo(a)</SelectItem>
@@ -475,7 +475,7 @@ function CatalogoInner() {
                                    {/* Versión móvil */}
                                    <button
                                        onClick={() => {agregarAlCarrito(producto)}}
-                                       className="flex md:hidden w-full py-2 px-4 bg-gradient-to-r from-amber-50 to-white border border-amber-200 text-amber-900 items-center justify-center gap-1.5 transition-all duration-300 ease-in-out hover:from-amber-100 hover:to-amber-50 hover:border-amber-300 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 group"
+                                       className="flex md:hidden w-full py-2 px-4 border border-amber-900 text-amber-900 hover:border-2  items-center justify-center gap-1.5 transition-all duration-300 ease-in-out  hover:border-amber-900 hover:shadow-md hover:shadow-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 group"
                                        style={{fontFamily: 'Georgia, serif', fontSize: '12px', fontWeight: '300', letterSpacing: '0.03em'}}
                                        title="Añadir al carrito"
                                    >

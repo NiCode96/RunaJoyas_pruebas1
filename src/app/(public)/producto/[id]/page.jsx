@@ -164,61 +164,83 @@ useEffect(() => {
 
 
 
+                  {/* SELLOS DE CONFIANZA */}
+                  <div className="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-md">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500 mb-5">
+                          Compra protegida y segura
+                      </p>
 
-                {/* BENEFICIOS / SELLOS DE CONFIANZA */}
-                <div className="mt-6 rounded-2xl border border-sky-200 bg-white text-slate-900 px-5 py-4 shadow-sm">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-sky-600 mb-4">
-                    Compra segura con Mercado Pago
-                  </p>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {/* Pago seguro */}
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10 ring-1 ring-sky-500/40 text-lg">
-                        🔒
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold">Pago 100% seguro</p>
-                        <p className="text-xs text-slate-500">
-                          Tus datos viajan cifrados y nunca se comparten con terceros.
-                        </p>
-                      </div>
-                    </div>
+                      {/*PANTALLAS DE CELULARES SELLOS DE CONFIANZA*/}
 
-                    {/* Medios de pago */}
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-400/10 ring-1 ring-sky-400/40 text-lg">
-                        💳
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-semibold">Medios de pago flexibles</p>
-                        <p className="text-xs text-slate-500">
-                          Tarjetas de crédito, débito y transferencias bancarias.
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <img
-                            src="/MP_RGB_HANDSHAKE_color_horizontal.svg"
-                            alt="Mercado Pago"
-                            className="h-6 w-auto object-contain"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      <div className="block md:hidden" >
+                          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 -mt-25">
 
-                    {/* Soporte */}
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-300/10 ring-1 ring-sky-300/40 text-lg">
-                        🤝
+                              {/* Seguridad */}
+                              <div className="space-y-2 mt-25">
+                                  <p className="text-sm font-semibold text-slate-900">
+                                      Pago seguro garantizado
+                                  </p>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Pago inmediato</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Crédito, débito, cuotas y saldo Mercado Pago</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Seguridad garantizada</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Comprobante automático</li>
+
+
+                              </div>
+
+
+
+                              {/* Atención */}
+                              <div >
+                                  <img
+                                      src="/Mercado_Pago.png"
+                                      alt="Mercado Pago"
+                                      className="h-50 w-auto object-contain -mt-10"
+                                  />
+                              </div>
+
+                          </div>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold">Soporte dedicado</p>
-                        <p className="text-xs text-slate-500">
-                          Acompañamos tu compra ante cualquier duda o problema.
-                        </p>
+
+
+
+
+
+                      {/*PANTALLAS DE ESCRITORIO SELLOS DE CONFIANZA*/}
+                      <div className="hidden md:block mt-10" >
+
+                          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 -mt-30">
+
+                              {/* Seguridad */}
+                              <div className="space-y-1 mt-25">
+                                  <p className="text-sm font-semibold text-slate-900">
+                                      Pago seguro garantizado
+                                  </p>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Pago inmediato</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Crédito, débito, cuotas y saldo Mercado Pago</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Seguridad garantizada</li>
+                                  <li className="text-xs text-slate-500 leading-relaxed ml-8">Comprobante automático</li>
+
+
+                              </div>
+
+
+
+                              {/* Atención */}
+                              <div >
+                                  <img
+                                      src="/Mercado_Pago.png"
+                                      alt="Mercado Pago"
+                                      className="h-50 w-auto object-contain mt-30"
+                                  />
+                              </div>
+
+                          </div>
                       </div>
-                    </div>
+
+
                   </div>
-                </div>
               </>
             )}
           </div>
